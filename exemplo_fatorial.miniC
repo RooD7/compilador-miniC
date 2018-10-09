@@ -1,0 +1,20 @@
+/*=============================
+** Programa exemplo em miniC
+**
+** - fatora um inteiro lido.
+**=============================
+*/
+
+int main()
+{
+	int num, div, resto;
+	scan("Entre com o inteiro:",num);
+
+	print("Fatorando...\n");
+	print(num," = ");
+
+	// procura um fator
+	for (div = 2; !(num % div); div = div + 1) {
+		print(div);
+	}
+}
