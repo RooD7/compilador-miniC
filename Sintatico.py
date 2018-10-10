@@ -5,27 +5,6 @@ def parse(self):
 	consome(tkEOF)
 	fechaAqrquivo()
 
-#
-def soma(self):
-	#soma = mult resto soma
-	res1 = self.mult()
-	res2 = self.restoSoma()
-	res = res1 + res2
-	return res
-
-#
-def restoSoma():
-	#restosoma = vazio | + mult resto soma | - mult resto soma
-	if (Atual.token == tkmais):
-		consome(tkmais)
-		self.mult()
-		self.restoSoma()
-	elif (Atual.token == tkmenos):
-		#print("ident")
-		self.mult()
-		self.restoSoma()
-	else:
-		pass	
 
 #
 def consome(self):
@@ -38,8 +17,163 @@ def consome(self):
 def atrib(self):
 	pass
 
+'''
+	###############################
+				Funcao main
+	###############################
+'''
 
-#
+'''
+	###############################
+		Descricao das intrucoes
+	###############################
+'''
+
+'''
+	declaracoes
+'''
+
+'''
+	Comando FOR
+'''
+
+'''
+	Comando de IO
+'''
+
+''' 
+	Comando WHILE
+'''
+
+def whileStmt(self):
+	consome(Token.whilee)
+	consome(Token.abrePar)
+	self.expr()
+	consome(Token.fechaPar)
+	self.stmt()
+
+'''
+	Comando IF
+'''
+# OK
+def ifStmt(self):
+	if(Atual.token == Token.ife):
+		consome(Token.ife)
+		consome(Token.abrePar)
+		self.expr()
+		consome(Token.fechaPar)
+		self.stmt()
+		self.elsePart()
+
+
+# OK
+def elsePart(self):
+	if(Atual.token == Token.elsee):
+		consome(Token.elsee)
+		self.stmt()
+
+'''
+	###############################
+				Expressoes
+	###############################
+'''
+
+# OK
+def expr(self):
+	self.atrib()
+
+# OK
+def atrib(self):
+	self.oor()
+	self.restoAtrib()
+
+# OK
+def restoAtrib(self):
+	if(Atual.token == Token.igual):
+		consome(Token.igual)
+		self.atrib()
+
+# OK
+def oor(self):
+	self.ande()
+	self.restoOr()
+
+# OK
+def restoOr(self):
+	if(Atual.token == Token.oor):
+		consome(Token.oor)
+		self.ande()
+		self.restoOr()
+
+# OK
+def ande(self):
+	self.note()
+	self.restoAnd()
+
+# OK
+def restoAnd(self):
+	if(Atual.token == Token.ande):
+		consome(Token.ande)
+		self.note()
+		self.restoAnd()
+
+# OK
+def note(self):
+	if(Atual.token == Token.note):
+		consome(Token.note)
+		self.note()
+	else:
+		self.rel()
+
+# OK
+def rel(self):
+	self.add()
+	self.restoRel()
+
+# OK
+def restoRel(self):
+	if(Atual.token == Token.igual):
+		consome(Token.igual)
+		self.add()
+	elif(Atual.token == Token.difer):
+		consome(Token.difer)
+		self.add()
+	elif(Atual.token == Token.menIgual):
+		consome(Token.menIgual)
+		self.add()
+elif(Atual.token == Token.maiIgual):
+		consome(Token.maiIgual)
+		self.add()
+	elif(Atual.token == Token.menor):
+		consome(Token.menor)
+		self.add()
+elif(Atual.token == Token.maior):
+		consome(Token.maior)
+		self.add()
+
+# OK ??
+def add(self):
+	res1 = self.mult()
+	res2 = self.restoAdd()
+	res = res1 + res2
+	return res
+
+# OK
+def restoAdd(self):
+	if(Atual.token == Token.soma):
+		consome(Token.soma)
+		r1 = self.mult()
+		r2 = self.restoAdd()
+		res = r1 + r2
+		return res
+	elif(Atual.token == Token.sub):
+		consome(Token.sub)
+		r1 = self.mult()
+		r2 = self.restoAdd()
+		res = r1 - r2
+		return res	
+
+# OK ???
 def mult(self):
 	r1 = uno()
 	r2 = restoMult()
@@ -50,17 +184,27 @@ def mult(self):
 '''
 	Traducao usando sintese (pai 'sintetiza' atributos dos filhos)
 '''
+
+# OK
 def restoMult(self):
 	if(Atual.token == Token.mult):
 		consome(Token.mult)
 		uno()
 		r1 = mult()
-		return mult()
+		r2 = restoMult()
+		res = r1 * r2
+		return res
 	elif(Atual.token == Token.div):
 		consome(Token.div)
 		r1 = uno()
 		r2 = restoMult()
-		res = r1 * r2
+		res = r1 / r2
+		return res
+	elif(Atual.token == Token.mod):
+		consome(Token.mod)
+		r1 = uno()
+		r2 = restoMult()
+		res = r1 % r2
 		return res
 
 '''
@@ -86,6 +230,7 @@ def uno(self):
 	else:
 		fator()
 
+# OK
 def fator(self):
 	if (Atual.token == Token.ident):
 		if (Atual.lexema in tabSimb):
@@ -98,10 +243,10 @@ def fator(self):
 		res = self.atrib()
 		consome(Token.fechaPar)
 	elif (Atual.token == Token.NUMint):
-		#	res == int (Atual.lexema)
+		res = int(Atual.lexema)
 		consome(Token.NUMint)
 	elif (Atual.token == Token.NUMfloat):
-		#	res == float (Atual.lexema)
+		res = float(Atual.lexema)
 		consome(Token.NUMfloat)
 	return res
 
