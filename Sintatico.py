@@ -7,21 +7,67 @@ def parse(self):
 
 
 #
-def consome(self):
-	if(Token == Atual.token):
+def consome(self, tk):
+	if(tk == Atual.token):
 		getToken()
 	else:
 		print("ERRO: era esperado o Token "+msg(Token+", mas veio o Token "+msg(Atual.token)+": linha "+Atual.linha+", coluna: "Atual.coluna+"\n"))
 
-#
-def atrib(self):
-	pass
 
 '''
 	###############################
 				Funcao main
 	###############################
 '''
+# OK
+def function(self):
+	self.type()
+	consome(Token.ident)
+	consome(Token.abrePar)
+	self.argList()
+	consome(Token.fechaPar)
+	self.bloco()
+
+# OK ??????
+def argList(self):
+	self.arg()
+	self.restoArgList()
+	# or continue
+
+# OK
+def arg(self):
+	self.type()
+	self.consome(Token.ident)
+
+# OK
+def restoArgList(self):
+	if(Atual.token == Token.virg):
+		self.consome(Token.virg)
+		self.argList()
+	else:
+		continue
+	
+
+# OK ???
+def type(self):
+	self.consome(Token.inte)
+	self.consome(Token.floate)
+
+# OK
+def bloco(self):
+	self.consome(Token.abreCha)
+	self.stmtList()
+	self.consome(Token.fechaCha)
+
+# OK ?????
+def stmtList(self):
+	self.stmt()
+	self.stmtList()
+	# or continue
+
+# ?????????
+def stmt(self):
+	pass
 
 '''
 	###############################
@@ -33,44 +79,126 @@ def atrib(self):
 	declaracoes
 '''
 
+def declaration(self):
+	self.type()
+	self.identList()
+	self.consome(Token.ptoVirg)
+
+# OK
+def identList(self):
+	self.consome(Token.ident)
+	self.restoIdentList()
+
+# OK
+def restoIdentList(self):
+	if(Atual.token == Token.virg):
+		self.consome(Token.virg)
+		self.consome(Token.ident)
+		self.restoIdentList()
+	else:
+		continue
+
 '''
 	Comando FOR
 '''
+
+# OK
+def forStmt(self):
+	self.consome(Token.foor)
+	self.consome(Token.abrePar)
+	self.optExpr()
+	self.consome(Token.ptoVirg)
+	self.optExpr()
+	self.consome(Token.ptoVirg)
+	self.optExpr()
+	self.consome(Token.fechaPar)
+	self.stmt()
+
+# OK ??
+def optExpr(self):
+	self.expr()
+	# or continue
 
 '''
 	Comando de IO
 '''
 
+# OK
+def ioStmt(self):
+	if(Atual.token == Token.scan):
+		self.consome(Token.scan)
+		self.consome(Token.abrePar)
+		self.consome(Token.ident)
+		self.consome(Token.fechaPar)
+		self.consome(Token.ptoVirg)
+	elif(Atual.token == Token.printe):
+		self.consome(Token.printe)
+		self.consome(Token.abrePar)
+		self.outList()
+		self.consome(Token.fechaPar)
+		self.consome(Token.ptoVirg)
+
+
+# OK
+def outList(self):
+	self.out()
+	self.restoOutList()
+
+# OKself.
+def out(self):
+	if(Atual.token == Token.strg):
+		self.consome(Token.strg)
+	elif(Atual.token == Token.ident):
+		self.consome(Token.ident)
+	elif(Atual.token == Token.NUMint):
+		self.consome(Token.NUMint)
+	elif(Atual.token == Token.NUMfloat):
+		self.consome(Token.NUMfloat)
+	else:
+		raise Exception('ERRO! ARG <out> | '+str(Atual.token))
+
+# OK
+def restoOutList(self):
+	if(Atual.token == Token.virg):
+		self.consome(Token.virg)
+		self.out()
+		self.restoOutList()
+	else: 
+		continue
+
 ''' 
 	Comando WHILE
 '''
 
+# OK
 def whileStmt(self):
-	consome(Token.whilee)
-	consome(Token.abrePar)
+	self.consome(Token.whilee)
+	self.consome(Token.abrePar)
 	self.expr()
-	consome(Token.fechaPar)
+	self.consome(Token.fechaPar)
 	self.stmt()
 
 '''
 	Comando IF
 '''
+
 # OK
 def ifStmt(self):
-	if(Atual.token == Token.ife):
-		consome(Token.ife)
-		consome(Token.abrePar)
-		self.expr()
-		consome(Token.fechaPar)
-		self.stmt()
-		self.elsePart()
+	self.consome(Token.ife)
+	self.consome(Token.abrePar)
+	self.expr()
+	self.consome(Token.fechaPar)
+	self.stmt()
+	self.elsePart()
 
 
 # OK
 def elsePart(self):
 	if(Atual.token == Token.elsee):
-		consome(Token.elsee)
+		self.consome(Token.elsee)
 		self.stmt()
+	else:
+		continue
 
 '''
 	###############################
@@ -90,8 +218,10 @@ def atrib(self):
 # OK
 def restoAtrib(self):
 	if(Atual.token == Token.igual):
-		consome(Token.igual)
+		self.consome(Token.igual)
 		self.atrib()
+	else:
+		continue
 
 # OK
 def oor(self):
@@ -101,9 +231,11 @@ def oor(self):
 # OK
 def restoOr(self):
 	if(Atual.token == Token.oor):
-		consome(Token.oor)
+		self.consome(Token.oor)
 		self.ande()
 		self.restoOr()
+	else:
+		continue
 
 # OK
 def ande(self):
@@ -113,14 +245,16 @@ def ande(self):
 # OK
 def restoAnd(self):
 	if(Atual.token == Token.ande):
-		consome(Token.ande)
+		self.consome(Token.ande)
 		self.note()
 		self.restoAnd()
+	else:
+		continue
 
 # OK
 def note(self):
 	if(Atual.token == Token.note):
-		consome(Token.note)
+		self.consome(Token.note)
 		self.note()
 	else:
 		self.rel()
@@ -133,122 +267,95 @@ def rel(self):
 # OK
 def restoRel(self):
 	if(Atual.token == Token.igual):
-		consome(Token.igual)
+		self.consome(Token.igual)
 		self.add()
 	elif(Atual.token == Token.difer):
-		consome(Token.difer)
+		self.consome(Token.difer)
 		self.add()
 	elif(Atual.token == Token.menIgual):
-		consome(Token.menIgual)
+		self.consome(Token.menIgual)
 		self.add()
-elif(Atual.token == Token.maiIgual):
-		consome(Token.maiIgual)
+	elif(Atual.token == Token.maiIgual):
+		self.consome(Token.maiIgual)
 		self.add()
 	elif(Atual.token == Token.menor):
-		consome(Token.menor)
+		self.consome(Token.menor)
 		self.add()
-elif(Atual.token == Token.maior):
-		consome(Token.maior)
+	elif(Atual.token == Token.maior):
+		self.consome(Token.maior)
 		self.add()
+	else:
+		continue
 
-# OK ??
+# OK
 def add(self):
-	res1 = self.mult()
-	res2 = self.restoAdd()
-	res = res1 + res2
-	return res
+	self.mult()
+	self.restoAdd()
 
 # OK
 def restoAdd(self):
 	if(Atual.token == Token.soma):
-		consome(Token.soma)
-		r1 = self.mult()
-		r2 = self.restoAdd()
-		res = r1 + r2
-		return res
+		self.consome(Token.soma)
+		self.mult()
+		self.restoAdd()
 	elif(Atual.token == Token.sub):
-		consome(Token.sub)
-		r1 = self.mult()
-		r2 = self.restoAdd()
-		res = r1 - r2
-		return res	
+		self.consome(Token.sub)
+		self.mult()
+		self.restoAdd()
+	else:
+		continue
 
-# OK ???
+# OK
 def mult(self):
-	r1 = uno()
-	r2 = restoMult()
-	res = r1 * r2
-	return res
+	self.uno()
+	self.restoMult()
 
 #
 '''
 	Traducao usando sintese (pai 'sintetiza' atributos dos filhos)
 '''
-
 # OK
 def restoMult(self):
 	if(Atual.token == Token.mult):
-		consome(Token.mult)
-		uno()
-		r1 = mult()
-		r2 = restoMult()
-		res = r1 * r2
-		return res
+		self.consome(Token.mult)
+		self.uno()
+		self.restoMult()
 	elif(Atual.token == Token.div):
-		consome(Token.div)
-		r1 = uno()
-		r2 = restoMult()
-		res = r1 / r2
-		return res
+		self.consome(Token.div)
+		self.uno()
+		self.restoMult()
 	elif(Atual.token == Token.mod):
-		consome(Token.mod)
-		r1 = uno()
-		r2 = restoMult()
-		res = r1 % r2
-		return res
-
-'''
-	Traducao usando heranca (filho 'herda' atributo do pai)
-# OK ''
- def restoMult(r1):
- 	if(Atual.token == Token.mult):
- 		consome(Token.mult)
- 		r2 = uno()
- 		res = r1 * r2
- 		r3 = restoMult(res)
- 		return r3
-'''
+		self.consome(Token.mod)
+		self.uno()
+		self.restoMult()
+	else:
+		continue
 
 # OK
 def uno(self):
 	if(Atual.token == Token.soma):
-		consome(Token.soma)
-		uno()
+		self.consome(Token.soma)
+		self.uno()
 	elif(Atual.token == Token.sub):
-		consome(Token.sub)
-		uno()
+		self.consome(Token.sub)
+		self.uno()
 	else:
-		fator()
+		self.fator()
 
 # OK
 def fator(self):
 	if (Atual.token == Token.ident):
-		if (Atual.lexema in tabSimb):
-			res = tabSimb[Atual.lexema]
-		else:
-			raise Exception("variavel nao declarada")
-		consome(Token.ident)
+		self.consome(Token.ident)
 	elif(Atual.token == Token.abrePar):
-		consome(Token.abrePar)
-		res = self.atrib()
-		consome(Token.fechaPar)
+		self.consome(Token.abrePar)
+		self.atrib()
+		self.consome(Token.fechaPar)
 	elif (Atual.token == Token.NUMint):
-		res = int(Atual.lexema)
-		consome(Token.NUMint)
+		self.consome(Token.NUMint)
 	elif (Atual.token == Token.NUMfloat):
-		res = float(Atual.lexema)
-		consome(Token.NUMfloat)
-	return res
+		self.consome(Token.NUMfloat)
+	else:
+		raise Exception('ERRO! ARG <fator> | '+str(Atual.token))
 
 '''
 def entra():
