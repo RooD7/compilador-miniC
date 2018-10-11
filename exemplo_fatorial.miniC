@@ -4,7 +4,8 @@
 ** - fatora um inteiro lido.
 **=============================
 */
-
+inteiro int
+floatee float
 
 int main()
 {
@@ -18,4 +19,5 @@ int main()
 	for (div = 2; !(num % div); div = div + 1) {
 		print(div);
 	}
+	while()
 }

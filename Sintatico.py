@@ -59,10 +59,29 @@ def bloco(self):
 	self.stmtList()
 	self.consome(Token.fechaCha)
 
-# OK ?????
+# OK
 def stmtList(self):
-	self.stmt()
-	self.stmtList()
+	# FIST de stmt
+	if(Atual.token == Token.note) or 
+	(Atual.token == Token.abrePar) or
+	(Atual.token == Token.soma) or
+	(Atual.token == Token.sub) or
+	(Atual.token == Token.ptoVirg) or
+	(Atual.token == Token.ident) or
+	(Atual.token == Token.NUMint) or
+	(Atual.token == Token.NUMfloat) or
+	(Atual.token == Token.breack) or
+	(Atual.token == Token.continuee) or
+	(Atual.token == Token.inte) or
+	(Atual.token == Token.floate) or
+	(Atual.token == Token.foor) or
+	(Atual.token == Token.ife) or
+	(Atual.token == Token.printe) or
+	(Atual.token == Token.scan) or
+	(Atual.token == Token.whilee) or
+	(Atual.token == Token.abreCha):
+		self.stmt()
+		self.stmtList()
 	# or continue
 
 # ?????????

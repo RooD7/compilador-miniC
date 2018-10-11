@@ -15,11 +15,12 @@ class Main:
 	print(file)
 	arquivo = open(file, 'r')
 	lexico = Lexico.Arquivo(arquivo.read())
+	token = Lexico.Token()
 	tk = 0
 	while(tk != 36):
-	#for x in range(1,40):
+	#for x in range(1,30):
 		tk = lexico.getToken()
-		print('@@@@@@@@@@@@@@')
-		print('MAIN Token: ',tk)
-		print('\n\n')
+		#print('@@@@@@@@@@@@@@')
+		print('Token: ',token.msg[tk])
+		#print('\n\n')
 
