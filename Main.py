@@ -20,7 +20,6 @@ class Main:
 	while(tk != 36):
 	#for x in range(1,30):
 		tk = lexico.getToken()
-		#print('@@@@@@@@@@@@@@')
 		print('Token: ',token.msg[tk])
 		#print('\n\n')
 

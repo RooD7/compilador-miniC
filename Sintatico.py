@@ -1,17 +1,30 @@
+class ErroSintatico(Exception) :
+	"""docstring for ErroSintatico"""
+	def __init__(self, tk):
+		self.token = tk
+
+    def __str__(self):	
+        return "ERRO: era esperado o Token "+msg(Token+", mas veio o Token "+msg(Atual.token)+": linha "+Atual.linha+", coluna: "Atual.coluna+"\n")	
+
+
 def parse(self):
 	apenArquivo()
-	getToken()
-	self.soma()
-	consome(tkEOF)
+	try:
+		getToken()
+		self.function()
+		consome(tkEOF)
+	except ErroSintatico as e:
+		print()
+		raise 
 	fechaAqrquivo()
 
 
-#
+# OK
 def consome(self, tk):
 	if(tk == Atual.token):
 		getToken()
 	else:
-		print("ERRO: era esperado o Token "+msg(Token+", mas veio o Token "+msg(Atual.token)+": linha "+Atual.linha+", coluna: "Atual.coluna+"\n"))
+		raise ErroSintatico(tk)
 
 
 '''
@@ -28,11 +41,13 @@ def function(self):
 	consome(Token.fechaPar)
 	self.bloco()
 
-# OK ??????
+# OK
 def argList(self):
-	self.arg()
-	self.restoArgList()
-	# or continue
+	if (Token.inte or Token.floate):
+		self.arg()
+		self.restoArgList()
+	else
+		pass
 
 # OK
 def arg(self):
@@ -45,13 +60,15 @@ def restoArgList(self):
 		self.consome(Token.virg)
 		self.argList()
 	else:
-		continue
+		pass
 	
 
 # OK ???
 def type(self):
-	self.consome(Token.inte)
-	self.consome(Token.floate)
+	if(Token.inte):
+		self.consome(Token.inte)
+	elif(Token.floate)
+		self.consome(Token.floate)
 
 # OK
 def bloco(self):
@@ -61,7 +78,6 @@ def bloco(self):
 
 # OK
 def stmtList(self):
-	# FIST de stmt
 	if(Atual.token == Token.note) or 
 	(Atual.token == Token.abrePar) or
 	(Atual.token == Token.soma) or
@@ -82,11 +98,34 @@ def stmtList(self):
 	(Atual.token == Token.abreCha):
 		self.stmt()
 		self.stmtList()
-	# or continue
+	else:
+		pass
 
-# ?????????
+# OK
 def stmt(self):
-	pass
+	if((Atual.token == Token.printe) or (Atual.token == Token.scan)):
+		self.ioStmt()
+	elif(Atual.token == Token.foor):
+		self.forStmt()
+	elif(Atual.token == Token.whilee):
+		self.whileStmt()
+	elif(Atual.token == Token.ife):
+		self.ifStmt()
+	elif(Atual.token == Token.abreCha):
+		self.bloco()
+	elif(Atual.token == Token.breack):
+		consome(Token.breack)
+	elif(Atual.token == Token.continuee):
+		consome(Token.continuee)
+	elif((Atual.token == Token.inte) or (Atual.token == Token.floate)):
+		self.declaration()
+	elif(Atual.token == Token.ptoVirg):
+		consome(Token.ptoVirg)
+	elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or 
+		((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
+			(Atual.token == Token.ident) or (Atual.token == Token.abrePar) ) )):
+		self.expr()
+		consome(Token.ptoVirg)	
 
 '''
 	###############################
@@ -95,9 +134,10 @@ def stmt(self):
 '''
 
 '''
-	declaracoes
+	declaraçoes
 '''
 
+# OK
 def declaration(self):
 	self.type()
 	self.identList()
@@ -133,10 +173,14 @@ def forStmt(self):
 	self.consome(Token.fechaPar)
 	self.stmt()
 
-# OK ??
+# OK
 def optExpr(self):
-	self.expr()
-	# or continue
+	if((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or 
+	((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
+	(Atual.token == Token.ident) or (Atual.token == Token.abrePar)))):
+		self.expr()
+	else:
+		pass
 
 '''
 	Comando de IO
@@ -157,13 +201,12 @@ def ioStmt(self):
 		self.consome(Token.fechaPar)
 		self.consome(Token.ptoVirg)
 
-
 # OK
 def outList(self):
 	self.out()
 	self.restoOutList()
 
-# OKself.
+# OK
 def out(self):
 	if(Atual.token == Token.strg):
 		self.consome(Token.strg)
@@ -173,8 +216,8 @@ def out(self):
 		self.consome(Token.NUMint)
 	elif(Atual.token == Token.NUMfloat):
 		self.consome(Token.NUMfloat)
-	else:
-		raise Exception('ERRO! ARG <out> | '+str(Atual.token))
+	# else:
+	# 	raise Exception('ERRO! ARG <out> | '+str(Atual.token))
 
 # OK
 def restoOutList(self):
@@ -183,7 +226,7 @@ def restoOutList(self):
 		self.out()
 		self.restoOutList()
 	else: 
-		continue
+		pass
 
 ''' 
 	Comando WHILE
@@ -217,7 +260,7 @@ def elsePart(self):
 		self.consome(Token.elsee)
 		self.stmt()
 	else:
-		continue
+		pass
 
 '''
 	###############################
@@ -240,7 +283,7 @@ def restoAtrib(self):
 		self.consome(Token.igual)
 		self.atrib()
 	else:
-		continue
+		pass
 
 # OK
 def oor(self):
@@ -254,7 +297,7 @@ def restoOr(self):
 		self.ande()
 		self.restoOr()
 	else:
-		continue
+		pass
 
 # OK
 def ande(self):
@@ -268,7 +311,7 @@ def restoAnd(self):
 		self.note()
 		self.restoAnd()
 	else:
-		continue
+		pass
 
 # OK
 def note(self):
@@ -304,7 +347,7 @@ def restoRel(self):
 		self.consome(Token.maior)
 		self.add()
 	else:
-		continue
+		pass
 
 # OK
 def add(self):
@@ -322,7 +365,7 @@ def restoAdd(self):
 		self.mult()
 		self.restoAdd()
 	else:
-		continue
+		pass
 
 # OK
 def mult(self):
@@ -348,7 +391,7 @@ def restoMult(self):
 		self.uno()
 		self.restoMult()
 	else:
-		continue
+		pass
 
 # OK
 def uno(self):
@@ -373,8 +416,8 @@ def fator(self):
 		self.consome(Token.NUMint)
 	elif (Atual.token == Token.NUMfloat):
 		self.consome(Token.NUMfloat)
-	else:
-		raise Exception('ERRO! ARG <fator> | '+str(Atual.token))
+	# else:
+	# 	raise Exception('ERRO! ARG <fator> | '+str(Atual.token))
 
 '''
 def entra():

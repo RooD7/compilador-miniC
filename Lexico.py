@@ -1,35 +1,35 @@
 class Token:
-	erro		= 0 ## erro
-	abrePar 	= 1 ## abre parenteses
-	fechaPar 	= 2 ## fecha parenteses
-	abreCha 	= 3 ## abre chaves
-	fechaCha 	= 4 ## fecha chaves
-	ident		= 5	## identificador (variavel)
-	inte		= 6 ## int
-	floate		= 7 ## float
-	breack		= 8 # break
-	continuee	= 9 # continue
+	erro		=  0 ## erro
+	abrePar 	=  1 ## abre parenteses
+	fechaPar 	=  2 ## fecha parenteses
+	abreCha 	=  3 ## abre chaves
+	fechaCha 	=  4 ## fecha chaves
+	ident		=  5 ## identificador (variavel)
+	inte		=  6 ## int
+	floate		=  7 ## float
+	breack		=  8 ## break
+	continuee	=  9 ## continue
 	ptoVirg		= 10 ## ponto e virgula
 	virg		= 11 ## virgula
-	foor		= 12 # for
+	foor		= 12 ## for
 	scan		= 13 ## scan
 	printe		= 14 ## print
-	strg		= 15 # str
+	strg		= 15 ## str
 	NUMint		= 16 ## numero inteiro
 	NUMfloat	= 17 ## numero float
 	whilee		= 18 ## while
-	ife			= 19 # if
-	elsee		= 20 # else
+	ife			= 19 ## if
+	elsee		= 20 ## else
 	igual		= 21 ## igual
-	difer		= 22 # diferente
+	difer		= 22 ## diferente
 	atrib		= 23 ## atributo
-	menIgual	= 24 # menor igual
-	maiIgual	= 25 # maior igual
-	menor		= 26 # menor
-	maior		= 27 # maior
-	oor 		= 28 # or
-	ande		= 29 # and
-	note		= 30 # not
+	menIgual	= 24 ## menor igual
+	maiIgual	= 25 ## maior igual
+	menor		= 26 ## menor
+	maior		= 27 ## maior
+	oor 		= 28 ## or
+	ande		= 29 ## and
+	note		= 30 ## not
 	soma		= 31 ## soma
 	sub			= 32 ## subtracao
 	mult		= 33 ## multiplicacao
@@ -41,7 +41,7 @@ class Token:
 	msg = ('erro','(',')','{','}','IDENT','int','float','break','continue',';',',','for','scan','print','STR','NUMint','NUMfloat','while','if','else','==','!=','=','<=','>=','<','>','||','&&','!','+','-','*','/','%','EOF')
 
 class Atual:
-	linha	= 0
+	linha	= 1
 	coluna	= 0
 	token	= ''
 	lexema	= ''
@@ -71,23 +71,35 @@ class Arquivo:
 			Atual.lexema += car
 			Atual.coluna += 1
 
-			#print('LINHA = ',Atual.linha)
-			#print('CAR = ',car)
-			#print('COLUNA = ',Atual.coluna)
+			print('LINHA = ',Atual.linha)
+			# print('CAR = ',car)
+			print('COLUNA = ',Atual.coluna)
 			#print('LEXEMA = ',Atual.lexema)
 			#print('TOKEN = ',Atual.token)
 
 			if(estado == 1):
 				if(car == '\n'):
 					Atual.linha += 1
-					Atual.coluna = 1
+					Atual.coluna = 0
 				if(car in (' ','\t')):
 					continue
-				#int
+				#break
+				elif(car.lower() == 'b'):
+					prev = 'b'
+					estado = 26
+				#continue
+				elif(car.lower() == 'c'):
+					prev = 'c'
+					estado = 27
+				#int, if
 				elif(car.lower() == 'i'):
 					prev = 'i'
 					estado = 12
-				#float
+				#else
+				elif(car.lower() == 'e'):
+					prev = 'e'
+					estado = 21
+				#float, for
 				elif(car.lower() == 'f'):
 					prev = 'f'
 					estado = 13
@@ -103,8 +115,34 @@ class Arquivo:
 				elif(car.lower() == 'w'):
 					prev = 'w'
 					estado = 17
+				#strg
+				elif(car.lower() == '"'):
+					prev = '"'
+					estado = 18
+				# div, /*, //
 				elif(car == '/'):
+					prev = '/'
 					estado = 10
+				# !, !=
+				elif(car == '!'):
+					prev = '!'
+					estado = 20
+				# >, >=
+				elif(car == '>'):
+					prev = '>'
+					estado = 22
+				# <, <=
+				elif(car == '<'):
+					prev = '<'
+					estado = 23
+				# ||
+				elif(car == '|'):
+					prev = '|'
+					estado = 24
+				# &&
+				elif(car == '&'):
+					prev = '&'
+					estado = 25
 				elif(car == ','):
 					return Token.virg
 				elif(car == ';'):
@@ -135,15 +173,12 @@ class Arquivo:
 			elif (estado == 2):
 				# letra ou digito
 				if(('a' <= car.lower() <= 'z') or ('0' <= car <= '9')):
-					#print('IDENTT === '+str(car))
 					continue
 				else:
-					#print('IDENTTee === '+str(car))
 					self.returCar(car)
 					estado = 3
 			### ident
 			elif (estado == 3):
-				# atualiza o atual
 				Atual.token = Token.ident
 				self.returCar(car)
 				return Token.ident
@@ -156,8 +191,6 @@ class Arquivo:
 					estado = 5
 			###	NUMint
 			elif (estado == 5):
-				# atualiza o atual
-				Atual.linha += 1
 				Atual.token = Token.NUMint
 				self.returCar(car)
 				return Token.NUMint
@@ -174,7 +207,6 @@ class Arquivo:
 			### erro
 			elif (estado == 8):
 				# atualiza o atual
-				Atual.linha += 1
 				Atual.token = Token.erro
 				self.returCar(car)
 				# return erro
@@ -182,26 +214,29 @@ class Arquivo:
 			### NUMfloat
 			elif (estado == 9):
 				# atualiza o atual
-				Atual.linha += 1
 				Atual.token = Token.NUMfloat
 				self.returCar(car)
 				# return NUMfloat
 				return Token.NUMfloat
 			### comentario
 			elif (estado == 10):
-				if(car == '*'):
+				if((car == '*') and (prev == '/')):
 					estado = 11
+				elif((car == '/') and (prev == '/')):
+					estado = 19
 				else:
 					self.returCar(car)
 					return Token.div
 			elif(estado == 11):
 				if(car == '*'):
-					continue
+					prev = '*'
+				elif((car == '/') and (prev == '*')):
+					estado = 1
 				elif(car == '\n'):
 					Atual.linha += 1
-					Atual.coluna = 1
-				elif(car == '/'):
-					estado = 1
+					Atual.coluna = 0
+				else:
+					prev = ''
 			## int
 			elif (estado == 12):
 				if((car == 'n') and (prev == 'i')):
@@ -209,11 +244,14 @@ class Arquivo:
 				elif((car == 't') and (prev == 'in')):
 					prev += 't'
 				elif(not('a' <= car.lower() <= 'z') and (prev == 'int')):
-					prev = ''
 					self.returCar(car)
 					return Token.inte
+				elif((car == 'f') and (prev == 'i')):
+					prev += 'f'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'if')):
+					self.returCar(car)
+					return Token.ife
 				else:
-					prev = ''
 					estado = 2
 			## float
 			elif (estado == 13):
@@ -227,15 +265,19 @@ class Arquivo:
 				elif((car == 't') and (prev == 'floa')):
 					prev += 't'
 				elif(not('a' <= car.lower() <= 'z') and (prev == 'float')):
-					prev = ''
 					self.returCar(car)
 					return Token.floate
+				elif((car == 'o') and (prev == 'f')):
+					prev += 'o'
+				elif((car == 'r') and (prev == 'fo')):
+					prev += 'r'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'for')):
+					self.returCar(car)
+					return Token.foor
 				else:
-					prev = ''
 					estado = 2
 			elif (estado == 14):
 				if((car == '=') and (prev == '=')):
-					prev = ''
 					#self.returCar(car)
 					return Token.igual
 				else:
@@ -253,11 +295,9 @@ class Arquivo:
 				elif((car == 't') and (prev == 'prin')):
 					prev += 't'
 				elif(not('a' <= car.lower() <= 'z') and (prev == 'print')):
-					prev = ''
 					self.returCar(car)
 					return Token.printe
 				else:
-					prev = ''
 					estado = 2
 			## scan
 			elif (estado == 16):
@@ -269,11 +309,9 @@ class Arquivo:
 				elif((car == 'n') and (prev == 'sca')):
 					prev += 'n'
 				elif(not('a' <= car.lower() <= 'z') and (prev == 'scan')):
-					prev = ''
 					self.returCar(car)
 					return Token.scan
 				else:
-					prev = ''
 					estado = 2
 			## while
 			elif (estado == 17):
@@ -287,11 +325,106 @@ class Arquivo:
 				elif((car == 'e') and (prev == 'whil')):
 					prev += 'e'
 				elif(not('a' <= car.lower() <= 'z') and (prev == 'while')):
-					prev = ''
 					self.returCar(car)
 					return Token.whilee
 				else:
-					prev = ''
+					estado = 2
+			## strg
+			elif (estado == 18):
+				if(car != '"'):
+					continue
+				else:
+					# self.returCar(car)
+					return Token.strg
+			## comentario //
+			elif (estado == 19):
+				if(car != '\n'):
+					continue
+				else:
+					Atual.linha += 1
+					Atual.coluna = 0
+					estado = 1
+			## !, !=
+			elif(estado == 20):
+				if((car == '=') and (prev == '!')):
+					return Token.difer
+				else:
+					return Token.note
+			## else
+			elif (estado == 21):
+				#print('PREV = '+prev)
+				if((car == 'l') and (prev == 'e')):
+					prev += 'l'
+				elif((car == 's') and (prev == 'el')):
+					prev += 's'
+				elif((car == 'e') and (prev == 'els')):
+					prev += 'e'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'else')):
+					self.returCar(car)
+					return Token.elsee
+				else:
+					estado = 2
+			## >, >=
+			elif(estado == 22):
+				if((car == '=') and (prev == '>')):
+					return Token.maiIgual
+				else:
+					return Token.maior
+			## <, <=
+			elif(estado == 23):
+				if((car == '=') and (prev == '<')):
+					return Token.menIgual
+				else:
+					return Token.menor
+			## ||
+			elif(estado == 24):
+				if((car == '|') and (prev == '|')):
+					return Token.oor
+				else:
+					return Token.erro
+			## &&
+			elif(estado == 25):
+				if((car == '&') and (prev == '&')):
+					return Token.ande
+				else:
+					return Token.erro
+			## break
+			elif (estado == 26):
+				#print('PREV = '+prev)
+				if((car == 'r') and (prev == 'b')):
+					prev += 'r'
+				elif((car == 'e') and (prev == 'br')):
+					prev += 'e'
+				elif((car == 'a') and (prev == 'bre')):
+					prev += 'a'
+				elif((car == 'k') and (prev == 'brea')):
+					prev += 'k'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'break')):
+					self.returCar(car)
+					return Token.breack
+				else:
+					estado = 2
+			## continue
+			elif (estado == 27):
+				#print('PREV = '+prev)
+				if((car == 'o') and (prev == 'c')):
+					prev += 'o'
+				elif((car == 'n') and (prev == 'co')):
+					prev += 'n'
+				elif((car == 't') and (prev == 'con')):
+					prev += 't'
+				elif((car == 'i') and (prev == 'cont')):
+					prev += 'i'
+				elif((car == 'n') and (prev == 'conti')):
+					prev += 'n'
+				elif((car == 'u') and (prev == 'contin')):
+					prev += 'u'
+				elif((car == 'e') and (prev == 'continu')):
+					prev += 'e'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'continue')):
+					self.returCar(car)
+					return Token.continuee
+				else:
 					estado = 2
 
 

@@ -18,6 +18,15 @@ int main()
 	// procura um fator
 	for (div = 2; !(num % div); div = div + 1) {
 		print(div);
+		if(x<1) || (x >= 12){
+			break;
+		} else {
+			continue;
+		}
+		if(x > 1) && (x<=12){
+		} else {
+
+		}
 	}
 	while()
 }
