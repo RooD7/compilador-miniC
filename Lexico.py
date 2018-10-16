@@ -43,7 +43,7 @@ class Token:
 class Atual:
 	linha	= 1
 	coluna	= 0
-	token	= ''
+	token	= 0
 	lexema	= ''
 
 class Arquivo:
@@ -71,9 +71,9 @@ class Arquivo:
 			Atual.lexema += car
 			Atual.coluna += 1
 
-			print('LINHA = ',Atual.linha)
+			#print('LINHA = ',Atual.linha)
 			# print('CAR = ',car)
-			print('COLUNA = ',Atual.coluna)
+			#print('COLUNA = ',Atual.coluna)
 			#print('LEXEMA = ',Atual.lexema)
 			#print('TOKEN = ',Atual.token)
 

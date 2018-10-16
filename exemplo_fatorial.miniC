@@ -4,13 +4,12 @@
 ** - fatora um inteiro lido.
 **=============================
 */
-inteiro int
-floatee float
 
 int main()
 {
 	int num, div, resto;
-	scan("Entre com o inteiro:",num);
+	//scan("Entre com o inteiro:",num);
+	scan(num);
 
 	print("Fatorando...\n");
 	print(num," = ");
