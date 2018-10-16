@@ -72,7 +72,7 @@ class Arquivo:
 			Atual.coluna += 1
 
 			#print('LINHA = ',Atual.linha)
-			# print('CAR = ',car)
+			#print('CAR = ',car)
 			#print('COLUNA = ',Atual.coluna)
 			#print('LEXEMA = ',Atual.lexema)
 			#print('TOKEN = ',Atual.token)
@@ -188,6 +188,7 @@ class Arquivo:
 				if (car == '.'):
 					estado = 6
 				else:
+					self.returCar(car)
 					estado = 5
 			###	NUMint
 			elif (estado == 5):

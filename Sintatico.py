@@ -15,8 +15,8 @@ class ErroSintatico(Exception):
 class Sintatico(object):
 		
 	def __init__(self, file):
-		arquivo = open(file, 'r')
-		self.lexico = Lexico.Arquivo(arquivo.read())
+		self.arquivo = open(file, 'r')
+		self.lexico = Lexico.Arquivo(self.arquivo.read())
 		
 
 	def parse(self):
@@ -24,11 +24,11 @@ class Sintatico(object):
 		try:
 			Atual.token = self.lexico.getToken()
 			self.function()
-			consome(Token.eof)
+			self.consome(Token.eof)
 		except ErroSintatico as e:
 			print(e)
 			raise 
-		arquivo.close()
+		self.arquivo.close()
 
 
 	# OK
@@ -90,24 +90,7 @@ class Sintatico(object):
 
 	# OK
 	def stmtList(self):
-		if((Atual.token == Token.note) or 
-		(Atual.token == Token.abrePar) or
-		(Atual.token == Token.soma) or
-		(Atual.token == Token.sub) or
-		(Atual.token == Token.ptoVirg) or
-		(Atual.token == Token.ident) or
-		(Atual.token == Token.NUMint) or
-		(Atual.token == Token.NUMfloat) or
-		(Atual.token == Token.breack) or
-		(Atual.token == Token.continuee) or
-		(Atual.token == Token.inte) or
-		(Atual.token == Token.floate) or
-		(Atual.token == Token.foor) or
-		(Atual.token == Token.ife) or
-		(Atual.token == Token.printe) or
-		(Atual.token == Token.scan) or
-		(Atual.token == Token.whilee) or
-		(Atual.token == Token.abreCha)):
+		if((Atual.token == Token.note) or (Atual.token == Token.abrePar) or (Atual.token == Token.soma) or (Atual.token == Token.sub) or (Atual.token == Token.ptoVirg) or (Atual.token == Token.ident) or (Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or (Atual.token == Token.breack) or (Atual.token == Token.continuee) or (Atual.token == Token.inte) or (Atual.token == Token.floate) or (Atual.token == Token.foor) or (Atual.token == Token.ife) or (Atual.token == Token.printe) or (Atual.token == Token.scan) or (Atual.token == Token.whilee) or (Atual.token == Token.abreCha)):
 			self.stmt()
 			self.stmtList()
 		else:
@@ -126,18 +109,16 @@ class Sintatico(object):
 		elif(Atual.token == Token.abreCha):
 			self.bloco()
 		elif(Atual.token == Token.breack):
-			consome(Token.breack)
+			self.consome(Token.breack)
 		elif(Atual.token == Token.continuee):
-			consome(Token.continuee)
+			self.consome(Token.continuee)
 		elif((Atual.token == Token.inte) or (Atual.token == Token.floate)):
 			self.declaration()
 		elif(Atual.token == Token.ptoVirg):
-			consome(Token.ptoVirg)
-		elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or 
-			((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
-				(Atual.token == Token.ident) or (Atual.token == Token.abrePar) ) )):
+			self.consome(Token.ptoVirg)
+		elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or ((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or (Atual.token == Token.ident) or (Atual.token == Token.abrePar) ) )):
 			self.expr()
-			consome(Token.ptoVirg)	
+			self.consome(Token.ptoVirg)	
 
 	'''
 		###############################
@@ -187,7 +168,7 @@ class Sintatico(object):
 
 	# OK
 	def optExpr(self):
-		if((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or 
+		if((Atual.token == Token.note) or (((Atual.token == Token.soma) or (Atual.token == Token.sub)) or 
 		((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
 		(Atual.token == Token.ident) or (Atual.token == Token.abrePar)))):
 			self.expr()
@@ -291,8 +272,8 @@ class Sintatico(object):
 
 	# OK
 	def restoAtrib(self):
-		if(Atual.token == Token.igual):
-			self.consome(Token.igual)
+		if(Atual.token == Token.atrib):
+			self.consome(Token.atrib)
 			self.atrib()
 		else:
 			pass
