@@ -303,8 +303,12 @@ class Sintatico(object):
 
 	# OK
 	def oor(self):
-		self.ande()
-		self.restoOr()
+		r1 = self.ande()
+		r2 = self.restoOr()
+		if (r1 and r2):
+			return True
+		else:
+			return False
 
 	# OK
 	def restoOr(self):
@@ -313,7 +317,8 @@ class Sintatico(object):
 			self.ande()
 			self.restoOr()
 		else:
-			pass
+			return True
+		return False
 
 	# OK
 	def ande(self):
