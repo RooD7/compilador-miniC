@@ -79,8 +79,10 @@ class Sintatico(object):
 	def type(self):
 		if(Atual.token == Token.inte):
 			self.consome(Token.inte)
-		elif(Atual.token == Token.floate):
+		# elif(Atual.token == Token.floate):
+		else:
 			self.consome(Token.floate)
+
 
 	# OK
 	def bloco(self):
@@ -90,7 +92,16 @@ class Sintatico(object):
 
 	# OK
 	def stmtList(self):
-		if((Atual.token == Token.note) or (Atual.token == Token.abrePar) or (Atual.token == Token.soma) or (Atual.token == Token.sub) or (Atual.token == Token.ptoVirg) or (Atual.token == Token.ident) or (Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or (Atual.token == Token.breack) or (Atual.token == Token.continuee) or (Atual.token == Token.inte) or (Atual.token == Token.floate) or (Atual.token == Token.foor) or (Atual.token == Token.ife) or (Atual.token == Token.printe) or (Atual.token == Token.scan) or (Atual.token == Token.whilee) or (Atual.token == Token.abreCha)):
+		if((Atual.token == Token.note) or (Atual.token == Token.abrePar) or 
+			(Atual.token == Token.soma) or (Atual.token == Token.sub) or 
+			(Atual.token == Token.ptoVirg) or (Atual.token == Token.ident) or 
+			(Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
+			(Atual.token == Token.breack) or (Atual.token == Token.continuee) or 
+			(Atual.token == Token.returne) or (Atual.token == Token.inte) or 
+			(Atual.token == Token.floate) or (Atual.token == Token.foor) or 
+			(Atual.token == Token.ife) or (Atual.token == Token.printe) or 
+			(Atual.token == Token.scan) or (Atual.token == Token.whilee) or 
+			(Atual.token == Token.abreCha)):
 			self.stmt()
 			self.stmtList()
 		else:
@@ -110,13 +121,23 @@ class Sintatico(object):
 			self.bloco()
 		elif(Atual.token == Token.breack):
 			self.consome(Token.breack)
+			self.consome(Token.ptoVirg)
 		elif(Atual.token == Token.continuee):
 			self.consome(Token.continuee)
+			self.consome(Token.ptoVirg)
+		elif(Atual.token == Token.returne):
+			self.consome(Token.returne)
+			self.fator()
+			self.consome(Token.ptoVirg)
 		elif((Atual.token == Token.inte) or (Atual.token == Token.floate)):
 			self.declaration()
 		elif(Atual.token == Token.ptoVirg):
 			self.consome(Token.ptoVirg)
-		elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or (Atual.token == Token.sub) or ((Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or (Atual.token == Token.ident) or (Atual.token == Token.abrePar) ) )):
+		 # elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or 
+			# (Atual.token == Token.sub) or ((Atual.token == Token.NUMint) or 
+			# (Atual.token == Token.NUMfloat) or (Atual.token == Token.ident) or 
+			# (Atual.token == Token.abrePar)))):
+		else:
 			self.expr()
 			self.consome(Token.ptoVirg)	
 
@@ -127,7 +148,7 @@ class Sintatico(object):
 	'''
 
 	'''
-		declaraçoes
+		declaracoes
 	'''
 
 	# OK
@@ -184,10 +205,13 @@ class Sintatico(object):
 		if(Atual.token == Token.scan):
 			self.consome(Token.scan)
 			self.consome(Token.abrePar)
+			self.consome(Token.strg)
+			self.consome(Token.virg)
 			self.consome(Token.ident)
 			self.consome(Token.fechaPar)
 			self.consome(Token.ptoVirg)
-		elif(Atual.token == Token.printe):
+		# elif(Atual.token == Token.printe):
+		else:
 			self.consome(Token.printe)
 			self.consome(Token.abrePar)
 			self.outList()
@@ -207,10 +231,9 @@ class Sintatico(object):
 			self.consome(Token.ident)
 		elif(Atual.token == Token.NUMint):
 			self.consome(Token.NUMint)
-		elif(Atual.token == Token.NUMfloat):
+		# elif(Atual.token == Token.NUMfloat):
+		else:
 			self.consome(Token.NUMfloat)
-		# else:
-		# 	raise Exception('ERRO! ARG <out> | '+str(Atual.token))
 
 	# OK
 	def restoOutList(self):
@@ -267,12 +290,12 @@ class Sintatico(object):
 
 	# OK
 	def atrib(self):
-		self.oor()
-		self.restoAtrib()
+		r1 = self.oor()
+		self.restoAtrib(r1)
 
 	# OK
-	def restoAtrib(self):
-		if(Atual.token == Token.atrib):
+	def restoAtrib(self, oor):
+		if((oor) and (Atual.token == Token.atrib)):
 			self.consome(Token.atrib)
 			self.atrib()
 		else:
@@ -294,8 +317,12 @@ class Sintatico(object):
 
 	# OK
 	def ande(self):
-		self.note()
-		self.restoAnd()
+		r1 = self.note()
+		r2 = self.restoAnd()
+		if (r1 and r2):
+			return True
+		else:
+			return False
 
 	# OK
 	def restoAnd(self):
@@ -304,7 +331,8 @@ class Sintatico(object):
 			self.note()
 			self.restoAnd()
 		else:
-			pass
+			return True
+		return False
 
 	# OK
 	def note(self):
@@ -312,12 +340,16 @@ class Sintatico(object):
 			self.consome(Token.note)
 			self.note()
 		else:
-			self.rel()
+			return self.rel()
 
 	# OK
 	def rel(self):
-		self.add()
-		self.restoRel()
+		r1 = self.add()
+		r2 = self.restoRel()
+		if (r1 and r2):
+			return True
+		else:
+			return False
 
 	# OK
 	def restoRel(self):
@@ -340,12 +372,17 @@ class Sintatico(object):
 			self.consome(Token.maior)
 			self.add()
 		else:
-			pass
+			return True
+		return False
 
 	# OK
 	def add(self):
-		self.mult()
-		self.restoAdd()
+		r1 = self.mult()
+		r2 = self.restoAdd()
+		if (r1 and r2):
+			return True
+		else:
+			return False
 
 	# OK
 	def restoAdd(self):
@@ -358,12 +395,17 @@ class Sintatico(object):
 			self.mult()
 			self.restoAdd()
 		else:
-			pass
+			return True
+		return False
 
 	# OK
 	def mult(self):
-		self.uno()
-		self.restoMult()
+		r1 = self.uno()
+		r2 = self.restoMult()
+		if (r1 and r2):
+			return True
+		else:
+			return False
 
 	#
 	'''
@@ -383,8 +425,10 @@ class Sintatico(object):
 			self.consome(Token.mod)
 			self.uno()
 			self.restoMult()
+		# Vazio
 		else:
-			pass
+			return True
+		return False
 
 	# OK
 	def uno(self):
@@ -395,35 +439,21 @@ class Sintatico(object):
 			self.consome(Token.sub)
 			self.uno()
 		else:
-			self.fator()
+			return self.fator()
+		return False
 
 	# OK
 	def fator(self):
 		if (Atual.token == Token.ident):
 			self.consome(Token.ident)
+			return True
 		elif(Atual.token == Token.abrePar):
 			self.consome(Token.abrePar)
 			self.atrib()
 			self.consome(Token.fechaPar)
 		elif (Atual.token == Token.NUMint):
 			self.consome(Token.NUMint)
-		elif (Atual.token == Token.NUMfloat):
+		# elif (Atual.token == Token.NUMfloat):
+		else:
 			self.consome(Token.NUMfloat)
-		# else:
-		# 	raise Exception('ERRO! ARG <fator> | '+str(Atual.token))
-
-	'''
-	def entra():
-		consome(Token.input)
-		consome(Token.abrePar)
-		if (Atual.token == Token.strg):
-			print(Token.lexema)
-		consome(Token.strg)
-		consome(Token.virg)
-		if(Atual.token == Token.ident):
-			res = input()
-			tabSimb[Atual.lexema] = float(res)
-			consome(Token.ident)
-			consome(Token.fechaPar)
-			consome(Token.ptoVirg)
-	'''
+		return False

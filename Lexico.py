@@ -36,6 +36,7 @@ class Token:
 	div			= 34 ## divisao
 	mod			= 35 ## mod
 	eof			= 36 ## eof
+	returne		= 37 ## return
 	
 
 	msg = ('erro','(',')','{','}','IDENT','int','float','break','continue',';',',','for','scan','print','STR','NUMint','NUMfloat','while','if','else','==','!=','=','<=','>=','<','>','||','&&','!','+','-','*','/','%','EOF')
@@ -115,6 +116,10 @@ class Arquivo:
 				elif(car.lower() == 'w'):
 					prev = 'w'
 					estado = 17
+				#return
+				elif(car.lower() == 'r'):
+					prev = 'r'
+					estado = 28
 				#strg
 				elif(car.lower() == '"'):
 					prev = '"'
@@ -427,6 +432,24 @@ class Arquivo:
 					return Token.continuee
 				else:
 					estado = 2
+			## return
+			elif (estado == 28):
+				if((car == 'e') and (prev == 'r')):
+					prev += 'e'
+				elif((car == 't') and (prev == 're')):
+					prev += 't'
+				elif((car == 'u') and (prev == 'ret')):
+					prev += 'u'
+				elif((car == 'r') and (prev == 'retu')):
+					prev += 'r'
+				elif((car == 'n') and (prev == 'retur')):
+					prev += 'n'
+				elif(not('a' <= car.lower() <= 'z') and (prev == 'return')):
+					self.returCar(car)
+					return Token.returne
+				else:
+					estado = 2
+
 
 
 
