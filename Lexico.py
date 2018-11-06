@@ -1,3 +1,6 @@
+'''
+	Analisador Lexico
+'''
 class Token:
 	erro		=  0 ## erro
 	abrePar 	=  1 ## abre parenteses
