@@ -446,6 +446,16 @@ class Sintatico(object):
 		elif(Atual.token == Token.sub):
 			self.consome(Token.sub)
 			self.uno()
+			# (left, lista, res) = self.uno()
+			# novoTemp = geraTemp()
+			'''
+				# geraTemp eh um gerador de variaveis temporarias, 
+				# que nao possa ser declarada pelo usuario, sugestao (_temp1, _temp2,...)
+				# sao variaveis que nao sao aceitas pela gramatica.
+			'''
+			# quad = ('-', novoTemp,'0',res)
+			# novaLista = lista + quad
+			# return (False, novaLista, novoTemp)
 		else:
 			return self.fator()
 		return False
@@ -454,14 +464,17 @@ class Sintatico(object):
 	def fator(self):
 		if (Atual.token == Token.ident):
 			self.consome(Token.ident)
+			# return (True, [], Atual.lexico.lexema)
 			return True
 		elif(Atual.token == Token.abrePar):
 			self.consome(Token.abrePar)
 			self.atrib()
+			# return (False, lista, res) = self.atrib()
 			self.consome(Token.fechaPar)
 		elif (Atual.token == Token.NUMint):
 			self.consome(Token.NUMint)
-		# elif (Atual.token == Token.NUMfloat):
+			# return (False, [], Atual.lexico.lexema)
 		else:
 			self.consome(Token.NUMfloat)
+			# return (False, [], Atual.lexico.lexema)
 		return False

@@ -4,6 +4,21 @@
 Tipo de Compilador:
 	Top-Down Descendente Recursivo Preditivo
 """
+
+'''
+	Proximos passos:
+		1. Analise Estatica
+			1. Declaracao de variaveis
+				# realizar a leitura do codigo fonte e verificar a declaracao de variaveis
+				#	Se encontrar uma declaracao
+				#		adicionar a variavel na tabela de simbolos (tabSimb)
+				#	Se encontrar um uso de variavel
+				#		verificar a declaracao da variavel na tabela de simbolos (tabSimb)
+				#	Dica: Usar o lexema do Lexico
+		2. Geracao de codigo intermediario
+
+		3. Maquina Virtual
+'''
 import Lexico
 import Sintatico
 import argparse
