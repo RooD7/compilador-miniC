@@ -254,11 +254,22 @@ class Sintatico(object):
 
 	# OK
 	def whileStmt(self):
-		self.consome(Token.whilee)
-		self.consome(Token.abrePar)
-		self.expr()
-		self.consome(Token.fechaPar)
-		self.stmt()
+		# self.consome(Token.whilee)
+		# self.consome(Token.abrePar)
+		# (lista, result) = self.expr()
+		# self.consome(Token.fechaPar)
+		# inicio 	= self.geraLabel()
+		# fim 	= self.geraLabel()
+		# listaCom = self.stmt(inicio, fim)
+		# codigo = []
+		# codigo += ('label', inicio, None, None)
+		# codigo += lista
+		# codigo += ('if', result, None, fim)
+		# codigo += listaCom
+		# codigo += ('jump', inicio, None, None)
+		# codigo += ('label', fim, None, None)
+		# return codigo
+
 
 	'''
 		Comando IF
@@ -295,7 +306,19 @@ class Sintatico(object):
 	# OK
 	def atrib(self):
 		r1 = self.oor()
+		# (boo1, lista1, result1) = self.oor()
 		self.restoAtrib(r1)
+		# (boo2, lista2, result2) = self.restoAtrib()
+		# if not boo2:
+		# 	return (boo1, lista1, result1)
+		# # tem atribuicao
+		# elif boo1:
+		# 	opera = ('=', result1, result2, None)
+		# 	lista3 = lista2 + opera
+		# 	return (False, lista3, result1) # nao left value
+		# else:
+		# 	# ERRO
+
 
 	# OK
 	def restoAtrib(self, oor):
@@ -447,6 +470,7 @@ class Sintatico(object):
 		elif(Atual.token == Token.sub):
 			self.consome(Token.sub)
 			self.uno()
+
 			# (left, lista, res) = self.uno()
 			# novoTemp = geraTemp()
 			'''

@@ -16,6 +16,8 @@ Tipo de Compilador:
 				#		verificar a declaracao da variavel na tabela de simbolos (tabSimb)
 				#	Dica: Usar o lexema do Lexico
 		2. Geracao de codigo intermediario
+			1. Geracao de comandos
+			2. Interpretacao de comandos
 
 		3. Maquina Virtual
 '''
