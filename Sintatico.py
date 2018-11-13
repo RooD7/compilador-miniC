@@ -20,6 +20,7 @@ class Sintatico(object):
 	def __init__(self, file):
 		self.arquivo = open(file, 'r')
 		self.lexico = Lexico.Arquivo(self.arquivo.read())
+		self.tabSimb = {}
 		
 
 	def parse(self):
