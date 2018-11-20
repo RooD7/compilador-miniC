@@ -62,6 +62,7 @@ class Arquivo:
 	def getToken(self):
 		estado = 1
 		prev = ''
+		Atual.lexema = ''
 		while(True):
 			#print('Linha atual: ',Atual.linha)
 			### eof
@@ -189,6 +190,7 @@ class Arquivo:
 			elif (estado == 3):
 				Atual.token = Token.ident
 				self.returCar(car)
+				Atual.lexema = Atual.lexema.split()[0]
 				return Token.ident
 			elif (estado == 4):
 				if ('0' <= car <= '9'):
@@ -412,6 +414,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.breack
 				else:
+					self.returCar(car)
 					estado = 2
 			## continue
 			elif (estado == 27):
@@ -458,3 +461,4 @@ class Arquivo:
 
 	def returCar(self,car):
 		self.arq = car + self.arq
+		Atual.lexema = Atual.lexema[:-1]

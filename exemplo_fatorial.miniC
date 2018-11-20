@@ -17,6 +17,7 @@ int main() {
 		// encontra o menor fator
 		for (div = 2; num % div; div = div + 1);
 
+		int a, b;
 		a = (b + 3);
 		print(div);
 		num = num / div;

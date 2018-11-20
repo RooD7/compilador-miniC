@@ -15,6 +15,15 @@ class ErroSintatico(Exception):
 	def __str__(self):
 		return "ERRO: era esperado o Token "+str(Token.msg[self.token])+", mas veio o Token "+str(Token.msg[Atual.token])+": linha "+str(Atual.linha)+", coluna: "+str(Atual.coluna)+"\n"
 
+class ErroSemantico(Exception):
+	"""docstring for ErroSintatico"""
+	def __init__(self, lex):
+		self.lexema = lex
+		# Atual = Lexico.Atual()
+
+	def __str__(self):
+		return "ERRO: a variavel '"+str(self.lexema)+"' nao foi declarada: linha "+str(Atual.linha)+", coluna: "+str(Atual.coluna)+"\n"
+
 class Sintatico(object):
 		
 	def __init__(self, file):
@@ -52,6 +61,8 @@ class Sintatico(object):
 	def function(self):
 		self.type()
 		self.consome(Token.ident)
+		# if not Atual.lexema in self.tabSimb:
+		# 	raise ErroSemantico(Atual.lexema)
 		self.consome(Token.abrePar)
 		self.argList()
 		self.consome(Token.fechaPar)
@@ -68,6 +79,8 @@ class Sintatico(object):
 	# OK
 	def arg(self):
 		self.type()
+		if not Atual.lexema in self.tabSimb:
+			raise ErroSemantico(Atual.lexema)
 		self.consome(Token.ident)
 
 	# OK
@@ -163,6 +176,7 @@ class Sintatico(object):
 
 	# OK
 	def identList(self):
+		self.tabSimb[Atual.lexema] = Atual.token
 		self.consome(Token.ident)
 		self.restoIdentList()
 
@@ -170,6 +184,7 @@ class Sintatico(object):
 	def restoIdentList(self):
 		if(Atual.token == Token.virg):
 			self.consome(Token.virg)
+			self.tabSimb[Atual.lexema] = Atual.token
 			self.consome(Token.ident)
 			self.restoIdentList()
 		else:
@@ -211,6 +226,8 @@ class Sintatico(object):
 			self.consome(Token.abrePar)
 			self.consome(Token.strg)
 			self.consome(Token.virg)
+			if not Atual.lexema in self.tabSimb:
+				raise ErroSemantico(Atual.lexema)
 			self.consome(Token.ident)
 			self.consome(Token.fechaPar)
 			self.consome(Token.ptoVirg)
@@ -232,6 +249,8 @@ class Sintatico(object):
 		if(Atual.token == Token.strg):
 			self.consome(Token.strg)
 		elif(Atual.token == Token.ident):
+			if not Atual.lexema in self.tabSimb:
+				raise ErroSemantico(Atual.lexema)
 			self.consome(Token.ident)
 		elif(Atual.token == Token.NUMint):
 			self.consome(Token.NUMint)
@@ -254,12 +273,14 @@ class Sintatico(object):
 
 	# OK
 	def whileStmt(self):
-		# self.consome(Token.whilee)
-		# self.consome(Token.abrePar)
+		self.consome(Token.whilee)
+		self.consome(Token.abrePar)
+		self.expr()
 		# (lista, result) = self.expr()
-		# self.consome(Token.fechaPar)
+		self.consome(Token.fechaPar)
 		# inicio 	= self.geraLabel()
 		# fim 	= self.geraLabel()
+		self.stmt()
 		# listaCom = self.stmt(inicio, fim)
 		# codigo = []
 		# codigo += ('label', inicio, None, None)
@@ -488,6 +509,8 @@ class Sintatico(object):
 	# OK
 	def fator(self):
 		if (Atual.token == Token.ident):
+			if not Atual.lexema in self.tabSimb:
+				raise ErroSemantico(Atual.lexema)
 			self.consome(Token.ident)
 			# return (True, [], Atual.lexico.lexema)
 			return True
