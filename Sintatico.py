@@ -326,17 +326,17 @@ class Sintatico(object):
 
 	# OK
 	def atrib(self):
-		r1 = self.oor()
-		(boo1, lista1, result1) = self.oor()
+		#r1 = self.oor()
+		[boo1, lista1, result1] = self.oor()
 		self.restoAtrib(r1)
-		(boo2, lista2, result2) = self.restoAtrib()
+		[boo2, lista2, result2] = self.restoAtrib()
 		if not boo2:
-			return (boo1, lista1, result1)
+			return [boo1, lista1, result1]
 		# tem atribuicao
 		elif boo1:
-			opera = ('=', result1, result2, None)
+			opera = ['=', result1, result2, None]
 			lista3 = lista2 + opera
-			return (False, lista3, result1) # nao left value
+			return [False, lista3, result1] # nao left value
 		else:
 			pass
 			# ERRO
@@ -499,7 +499,7 @@ class Sintatico(object):
 			self.uno()
 
 			[left, lista, res] = self.uno()
-			novoTemp = geraTemp()
+			novoTemp = self.geraTemp()
 			'''
 				# geraTemp eh um gerador de variaveis temporarias, 
 				# que nao possa ser declarada pelo usuario, sugestao (_temp1, _temp2,...)
