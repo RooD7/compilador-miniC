@@ -276,19 +276,19 @@ class Sintatico(object):
 		self.consome(Token.whilee)
 		self.consome(Token.abrePar)
 		self.expr()
-		(lista, result) = self.expr()
+		[lista, result] = self.expr()
 		self.consome(Token.fechaPar)
 		inicio 	= self.geraLabel()
 		fim 	= self.geraLabel()
 		self.stmt()
 		listaCom = self.stmt(inicio, fim)
 		codigo = []
-		codigo += ('label', inicio, None, None)
+		codigo += ['label', inicio, None, None]
 		codigo += lista
-		codigo += ('if', result, None, fim)
+		codigo += ['if', result, None, fim]
 		codigo += listaCom
-		codigo += ('jump', inicio, None, None)
-		codigo += ('label', fim, None, None)
+		codigo += ['jump', inicio, None, None]
+		codigo += ['label', fim, None, None]
 		return codigo
 
 
@@ -322,21 +322,19 @@ class Sintatico(object):
 
 	# OK
 	def expr(self):
-		self.atrib()
+		return self.atrib()
 
 	# OK
 	def atrib(self):
 		#r1 = self.oor()
-		[boo1, lista1, result1] = self.oor()
-		self.restoAtrib(r1)
-		[boo2, lista2, result2] = self.restoAtrib()
-		if not boo2:
-			return [boo1, lista1, result1]
+		[bol1, lista1, result1] = self.oor()
+		[bol2, lista2, result2] = self.restoAtrib(result1)
+		if not bol2:
+			return [bol1, lista1, result1]
 		# tem atribuicao
-		elif boo1:
-			opera = ['=', result1, result2, None]
-			lista3 = lista2 + opera
-			return [False, lista3, result1] # nao left value
+		elif bol1:
+			quad = ['=', result1, result2, None]
+			return [False, lista2+quad, result1] # nao left value
 		else:
 			pass
 			# ERRO
@@ -346,89 +344,102 @@ class Sintatico(object):
 	def restoAtrib(self, oor):
 		if((oor) and (Atual.token == Token.atrib)):
 			self.consome(Token.atrib)
-			self.atrib()
+			[bol1, lista1, f2] = self.atrib()
+			quad = ['=', f2, f1, f2]
+###################
+			return [bol1, lista1+quad, f2]
 		else:
 			pass
 
 	# OK
 	def oor(self):
-		r1 = self.ande()
-		r2 = self.restoOr()
-		if (r1 and r2):
-			return True
-		else:
-			return False
-
-	# OK
-	def restoOr(self):
-		if(Atual.token == Token.oor):
-			self.consome(Token.oor)
-			self.ande()
-			self.restoOr()
-		else:
-			return True
-		return False
-
-	# OK
-	def ande(self):
-		r1 = self.note()
-		r2 = self.restoAnd()
-		if (r1 and r2):
-			return True
-		else:
-			return False
-
-	# OK
-	def restoAnd(self):
-		if(Atual.token == Token.ande):
-			self.consome(Token.ande)
-			self.note()
-			self.restoAnd()
-		else:
-			return True
-		return False
-
-	# OK
-	def note(self):
-		if(Atual.token == Token.note):
-			self.consome(Token.note)
-			self.note()
-		else:
-			return self.rel()
-
-	# OK
-	def rel(self):
-		[bol1, lista1, result1] = self.add()
-		[bol2, lista2, result2] = self.restoRel()
+		[bol1, lista1, result1] = self.ande()
+		[bol2, lista2, result2] = self.restoOr(result1)
 		if (bol1 and bol2):
 			return [True, lista1+lista2, result2]
 		else:
 			return [False, lista1+lista2, result2]
 
 	# OK
-	def restoRel(self):
+	def restoOr(self, f1):
+		if(Atual.token == Token.oor):
+			self.consome(Token.oor)
+			[bol1, lista1, f2] = self.ande()
+			quad = ['||', f2, f1, f2]
+			[bol2, lista2, result] = self.restoOr()
+		else:
+			return [True, [], f1]
+		return [False, lista1+quad+lista2, result]
+	# OK
+	def ande(self):
+		[bol1, lista1, result1] = self.note()
+		[bol2, lista2, result2] = self.restoAnd(result1)
+		if (bol1 and bol2):
+			return [True, lista1+lista2, result2]
+		else:
+			return [False, lista1+lista2, result2]
+
+	# OK
+	def restoAnd(self, f1):
+		if(Atual.token == Token.ande):
+			self.consome(Token.ande)
+			[bol1, lista1, f2] = self.note()
+			quad = ['&&', f2, f1, f2]
+			[bol2, lista2, result] = self.restoAnd()
+		else:
+			return [True, [], f1]
+		return [False, lista1+quad+lista2, result]
+
+	# OK
+	def note(self, f1):
+		if(Atual.token == Token.note):
+			self.consome(Token.note)
+			[bol1, lista1, result1] = self.note(result1)
+			quad = ['!', f2, f1, f2]
+################################
+			return [True, lista1+quad, result1]
+		else:
+			return self.rel()
+
+	# OK
+	def rel(self):
+		[bol1, lista1, result1] = self.add()
+		[bol2, lista2, result2] = self.restoRel(result1)
+		if (bol1 and bol2):
+			return [True, lista1+lista2, result2]
+		else:
+			return [False, lista1+lista2, result2]
+
+	# OK
+	def restoRel(self, f1):
 		if(Atual.token == Token.igual):
 			self.consome(Token.igual)
-			[bol1, lista1, result1] = self.add()
+			[bol1, lista1, f2] = self.add()
 			quad = ['==', f2, f1, f2]
 		elif(Atual.token == Token.difer):
 			self.consome(Token.difer)
-			self.add()
+			[bol1, lista1, f2] = self.add()
+			quad = ['!=', f2, f1, f2]
 		elif(Atual.token == Token.menIgual):
 			self.consome(Token.menIgual)
-			self.add()
+			[bol1, lista1, f2] = self.add()
+			quad = ['<=', f2, f1, f2]
 		elif(Atual.token == Token.maiIgual):
 			self.consome(Token.maiIgual)
-			self.add()
+			[bol1, lista1, f2] = self.add()
+			quad = ['>=', f2, f1, f2]
 		elif(Atual.token == Token.menor):
 			self.consome(Token.menor)
-			self.add()
+			[bol1, lista1, f2] = self.add()
+			quad = ['<', f2, f1, f2]
 		elif(Atual.token == Token.maior):
 			self.consome(Token.maior)
 			[bol1, lista1, result1] = self.add()
+			quad = ['>', f2, f1, f2]
 		else:
 			return [True, [], f1]
-		return False
+#####################################
+		return [False, lista1+quad, result]
 
 	# OK OK
 	def add(self):
@@ -440,17 +451,17 @@ class Sintatico(object):
 			return [False, lista1+lista2, result2]
 
 	# OK OK
-	def restoAdd(self):
+	def restoAdd(self, f1):
 		if(Atual.token == Token.soma):
 			self.consome(Token.soma)
-			[lista2, f2] = self.mult()
+			[bol1, lista2, f2] = self.mult()
 			quad = ['+', f2, f1, f2]
-			[lista3, result] = self.restoAdd(f2)
+			[bol2, lista3, result] = self.restoAdd(f2)
 		elif(Atual.token == Token.sub):
 			self.consome(Token.sub)
-			[lista2, f2] = self.mult()
+			[bol1, lista2, f2] = self.mult()
 			quad = ['-', f2, f1, f2]
-			[lista3, result] = self.restoAdd(f2)
+			[bol2, lista3, result] = self.restoAdd(f2)
 		# Vazio
 		else:
 			return [True, [], f1]
@@ -470,19 +481,19 @@ class Sintatico(object):
 	def restoMult(self, f1):
 		if(Atual.token == Token.mult):
 			self.consome(Token.mult)
-			[lista2, f2] = self.uno()
+			[bol1, lista2, f2] = self.uno()
 			quad = ['*', f2, f1, f2]
-			[lista3, result] = self.restoMult(f2)
+			[bol2, lista3, result] = self.restoMult(f2)
 		elif(Atual.token == Token.div):
 			self.consome(Token.div)
-			[lista2, f2] = self.uno()
+			[bol1, lista2, f2] = self.uno()
 			quad = ['/', f2, f1, f2]
-			[lista3, result] = self.restoMult(f2)
+			[bol2, lista3, result] = self.restoMult(f2)
 		elif(Atual.token == Token.mod):
 			self.consome(Token.mod)
-			[lista2, f2] = self.uno()
+			[bol1, lista2, f2] = self.uno()
 			quad = ['%', f2, f1, f2]
-			[lista3, result] = self.restoMult(f2)
+			[bol2, lista3, result] = self.restoMult(f2)
 		# Vazio
 		else:
 			return [True, [], f1]
