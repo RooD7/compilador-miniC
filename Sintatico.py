@@ -61,7 +61,7 @@ class Sintatico(object):
 	def function(self):
 		self.type()
 		self.consome(Token.ident)
-		# if not Atual.lexema in self.tabSimb:
+		# if Atual.lexema in self.tabSimb:
 		# 	raise ErroSemantico(Atual.lexema)
 		self.consome(Token.abrePar)
 		self.argList()
@@ -198,13 +198,26 @@ class Sintatico(object):
 	def forStmt(self):
 		self.consome(Token.foor)
 		self.consome(Token.abrePar)
-		self.optExpr()
+		[lista_OpExpr1, result_OpExpr1] = self.optExpr()
 		self.consome(Token.ptoVirg)
-		self.optExpr()
+		[lista_OpExpr2, result_OpExpr2] = self.optExpr()
 		self.consome(Token.ptoVirg)
-		self.optExpr()
+		[lista_OpExpr3, result_OpExpr3] = self.optExpr()
 		self.consome(Token.fechaPar)
-		self.stmt()
+		[lista_stmt, result_stmt] = self.stmt()
+
+
+		inicio 	= self.geraLabel()
+		fim 	= self.geraLabel()
+		codigo = []
+		codigo += result_OpExpr1
+		codigo += ['label', inicio, None, None]
+		codigo += ['if', result_OpExpr2, None, fim]
+		codigo += lista_stmt
+		codigo += result_OpExpr3
+		codigo += ['jump', inicio, None, None]
+		codigo += ['label', fim, None, None]
+		return codigo
 
 	# OK
 	def optExpr(self):
@@ -257,12 +270,15 @@ class Sintatico(object):
 		# elif(Atual.token == Token.NUMfloat):
 		else:
 			self.consome(Token.NUMfloat)
+##############################
+		return Atual.lexico.lexema
 
 	# OK
 	def restoOutList(self):
 		if(Atual.token == Token.virg):
 			self.consome(Token.virg)
-			self.out()
+############################
+			lexema = self.out()
 			self.restoOutList()
 		else: 
 			pass
@@ -275,19 +291,21 @@ class Sintatico(object):
 	def whileStmt(self):
 		self.consome(Token.whilee)
 		self.consome(Token.abrePar)
-		self.expr()
+		# self.expr()
 		[lista, result] = self.expr()
 		self.consome(Token.fechaPar)
-		inicio 	= self.geraLabel()
-		fim 	= self.geraLabel()
-		self.stmt()
+		inicio1 	= self.geraLabel()
+		inicio2 	= self.geraLabel()
+		fim 		= self.geraLabel()
+		# self.stmt()
 		listaCom = self.stmt(inicio, fim)
 		codigo = []
-		codigo += ['label', inicio, None, None]
+		codigo += ['label', inicio1, None, None]
 		codigo += lista
-		codigo += ['if', result, None, fim]
+		codigo += ['if', result, inicio2, fim]
+		codigo += ['label', inicio2, None, None]
 		codigo += listaCom
-		codigo += ['jump', inicio, None, None]
+		codigo += ['jump', inicio1, None, None]
 		codigo += ['label', fim, None, None]
 		return codigo
 
@@ -300,19 +318,34 @@ class Sintatico(object):
 	def ifStmt(self):
 		self.consome(Token.ife)
 		self.consome(Token.abrePar)
-		self.expr()
+		[lista_expr, result_expr] = self.expr()
 		self.consome(Token.fechaPar)
-		self.stmt()
-		self.elsePart()
+		inicio_if 	= self.geraLabel()
+		inicio_el 	= self.geraLabel()
+		fim_if 		= self.geraLabel()
+		fim_el 		= self.geraLabel()
+		lista_if = self.stmt()
+		lista_el = self.elsePart()
+		codigo = []
+		codigo += lista_expr
+		codigo += ['if', result_expr, inicio_if, inicio_el]
+		codigo += ['label', inicio_if, None, None]
+		codigo += lista_stmt
+		codigo += ['label', fim_if, None, None]
+		codigo += ['label', inicio_el, None, None]
+		codigo += lista_else
+		codigo += ['label', fim_el, None, None]
+		return codigo
 
 
 	# OK
 	def elsePart(self):
 		if(Atual.token == Token.elsee):
 			self.consome(Token.elsee)
+			# [bol_stmt, lista_stmt, result_stmt] = self.stmt()
 			self.stmt()
 		else:
-			pass
+			return [False, [], f1]
 
 	'''
 		###############################
@@ -322,13 +355,15 @@ class Sintatico(object):
 
 	# OK
 	def expr(self):
-		return self.atrib()
+		[bol, lista, result]  = self.atrib()
+		return [lista, result]
 
 	# OK
 	def atrib(self):
-		#r1 = self.oor()
 		[bol1, lista1, result1] = self.oor()
 		[bol2, lista2, result2] = self.restoAtrib(result1)
+		#verificar a condicao
+		#if bol2:
 		if not bol2:
 			return [bol1, lista1, result1]
 		# tem atribuicao
@@ -341,22 +376,24 @@ class Sintatico(object):
 
 
 	# OK
-	def restoAtrib(self, oor):
-		if((oor) and (Atual.token == Token.atrib)):
+	def restoAtrib(self, f1):
+		#if((oor) and (Atual.token == Token.atrib)):
+		if(Atual.token == Token.atrib):
 			self.consome(Token.atrib)
 			[bol1, lista1, f2] = self.atrib()
-			quad = ['=', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['=', novoTemp, f1, f2]
 ###################
-			return [bol1, lista1+quad, f2]
 		else:
-			pass
+			return [True, [], f1]
+		return [bol1, lista1+quad, f2]
 
 	# OK
 	def oor(self):
 		[bol1, lista1, result1] = self.ande()
 		[bol2, lista2, result2] = self.restoOr(result1)
 		if (bol1 and bol2):
-			return [True, lista1+lista2, result2]
+			return [True, lista1, result1]
 		else:
 			return [False, lista1+lista2, result2]
 
@@ -365,11 +402,16 @@ class Sintatico(object):
 		if(Atual.token == Token.oor):
 			self.consome(Token.oor)
 			[bol1, lista1, f2] = self.ande()
-			quad = ['||', f2, f1, f2]
-			[bol2, lista2, result] = self.restoOr()
+			novoTemp = self.geraTemp()
+			quad = ['||', novoTemp, f1, f2]
+			[bol2, lista2, result] = self.restoOr(f1)
+			if bol2:
+				return [False, lista1, f2]
+			else:
+				return [False, lista1+quad+lista2, result]
 		else:
 			return [True, [], f1]
-		return [False, lista1+quad+lista2, result]
+
 	# OK
 	def ande(self):
 		[bol1, lista1, result1] = self.note()
@@ -377,27 +419,34 @@ class Sintatico(object):
 		if (bol1 and bol2):
 			return [True, lista1+lista2, result2]
 		else:
-			return [False, lista1+lista2, result2]
+			return [False, lista1, result1]
 
 	# OK
 	def restoAnd(self, f1):
 		if(Atual.token == Token.ande):
 			self.consome(Token.ande)
 			[bol1, lista1, f2] = self.note()
-			quad = ['&&', f2, f1, f2]
-			[bol2, lista2, result] = self.restoAnd()
+			novoTemp = self.geraTemp()
+			quad = ['&&', novoTemp, f1, f2]
+			[bol2, lista2, result] = self.restoAnd(f1)
+			if bol2:
+				return [False, lista1, f2]
+			else:
+				return [False, lista1+quad+lista2, result]
 		else:
 			return [True, [], f1]
-		return [False, lista1+quad+lista2, result]
 
 	# OK
-	def note(self, f1):
+	def note(self):
 		if(Atual.token == Token.note):
 			self.consome(Token.note)
-			[bol1, lista1, result1] = self.note(result1)
-			quad = ['!', f2, f1, f2]
-################################
-			return [True, lista1+quad, result1]
+			[bol, lista, result] = self.note()
+			novoTemp = self.geraTemp()
+			quad = ['!', novoTemp,result, None]
+			# Minha versao
+			#return [True, lista+quad, novoTemp]
+			# Versao Lucas
+			return [False, lista+quad, novoTemp]
 		else:
 			return self.rel()
 
@@ -406,7 +455,7 @@ class Sintatico(object):
 		[bol1, lista1, result1] = self.add()
 		[bol2, lista2, result2] = self.restoRel(result1)
 		if (bol1 and bol2):
-			return [True, lista1+lista2, result2]
+			return [True, lista1, result1]
 		else:
 			return [False, lista1+lista2, result2]
 
@@ -415,27 +464,33 @@ class Sintatico(object):
 		if(Atual.token == Token.igual):
 			self.consome(Token.igual)
 			[bol1, lista1, f2] = self.add()
-			quad = ['==', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['==', novoTemp, f1, f2]
 		elif(Atual.token == Token.difer):
 			self.consome(Token.difer)
 			[bol1, lista1, f2] = self.add()
-			quad = ['!=', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['!=', novoTemp, f1, f2]
 		elif(Atual.token == Token.menIgual):
 			self.consome(Token.menIgual)
 			[bol1, lista1, f2] = self.add()
-			quad = ['<=', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['<=', novoTemp, f1, f2]
 		elif(Atual.token == Token.maiIgual):
 			self.consome(Token.maiIgual)
 			[bol1, lista1, f2] = self.add()
-			quad = ['>=', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['>=', novoTemp, f1, f2]
 		elif(Atual.token == Token.menor):
 			self.consome(Token.menor)
 			[bol1, lista1, f2] = self.add()
-			quad = ['<', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['<', novoTemp, f1, f2]
 		elif(Atual.token == Token.maior):
 			self.consome(Token.maior)
 			[bol1, lista1, result1] = self.add()
-			quad = ['>', f2, f1, f2]
+			novoTemp = self.geraTemp()
+			quad = ['>', novoTemp, f1, f2]
 		else:
 			return [True, [], f1]
 #####################################
@@ -446,7 +501,7 @@ class Sintatico(object):
 		[bol1, lista1, result1] = self.mult()
 		[bol2, lista2, result2] = self.restoAdd(result1)
 		if (bol1 and bol2):
-			return [True, lista1+lista2, result2]
+			return [True, lista1, result1]
 		else:
 			return [False, lista1+lista2, result2]
 
@@ -455,13 +510,15 @@ class Sintatico(object):
 		if(Atual.token == Token.soma):
 			self.consome(Token.soma)
 			[bol1, lista2, f2] = self.mult()
-			quad = ['+', f2, f1, f2]
-			[bol2, lista3, result] = self.restoAdd(f2)
+			novoTemp = self.geraTemp()
+			quad = ['+', novoTemp, f1, f2]
+			[bol2, lista3, result] = self.restoAdd(novoTemp)
 		elif(Atual.token == Token.sub):
 			self.consome(Token.sub)
 			[bol1, lista2, f2] = self.mult()
-			quad = ['-', f2, f1, f2]
-			[bol2, lista3, result] = self.restoAdd(f2)
+			novoTemp = self.geraTemp()
+			quad = ['-', novoTemp, f1, f2]
+			[bol2, lista3, result] = self.restoAdd(novoTemp)
 		# Vazio
 		else:
 			return [True, [], f1]
@@ -473,7 +530,7 @@ class Sintatico(object):
 		[bol1, lista1, result1] = self.uno()
 		[bol2, lista2, result2] = self.restoMult(result1)
 		if (bol1 and bol2):
-			return [True, lista1+lista2, result2]
+			return [True, lista1, result1]
 		else:
 			return [False, lista1+lista2, result2]
 
@@ -482,63 +539,74 @@ class Sintatico(object):
 		if(Atual.token == Token.mult):
 			self.consome(Token.mult)
 			[bol1, lista2, f2] = self.uno()
-			quad = ['*', f2, f1, f2]
-			[bol2, lista3, result] = self.restoMult(f2)
+			novoTemp = self.geraTemp()
+			quad = ['*', novoTemp, f1, f2]
+			[bol2, lista3, result] = self.restoMult(novoTemp)
 		elif(Atual.token == Token.div):
 			self.consome(Token.div)
 			[bol1, lista2, f2] = self.uno()
-			quad = ['/', f2, f1, f2]
-			[bol2, lista3, result] = self.restoMult(f2)
+			novoTemp = self.geraTemp()
+			quad = ['/', novoTemp, f1, f2]
+			[bol2, lista3, result] = self.restoMult(novoTemp)
 		elif(Atual.token == Token.mod):
 			self.consome(Token.mod)
 			[bol1, lista2, f2] = self.uno()
-			quad = ['%', f2, f1, f2]
-			[bol2, lista3, result] = self.restoMult(f2)
+			novoTemp = self.geraTemp()
+			quad = ['%', novoTemp, f1, f2]
+			[bol2, lista3, result] = self.restoMult(novoTemp)
 		# Vazio
 		else:
 			return [True, [], f1]
 		return [False, lista2+quad+lista3, result]
 
 
-	# OK
+	# OK OK
 	def uno(self):
 		if(Atual.token == Token.soma):
 			self.consome(Token.soma)
-			self.uno()
-		elif(Atual.token == Token.sub):
-			self.consome(Token.sub)
-			self.uno()
-
-			[left, lista, res] = self.uno()
+			[bol, lista, result] = self.uno()
 			novoTemp = self.geraTemp()
 			'''
 				# geraTemp eh um gerador de variaveis temporarias, 
 				# que nao possa ser declarada pelo usuario, sugestao (_temp1, _temp2,...)
 				# sao variaveis que nao sao aceitas pela gramatica.
 			'''
-			quad = ['-', novoTemp,'0',res]
-			novaLista = lista + quad
-			return [False, novaLista, novoTemp]
+			quad = ['+', novoTemp,'0',result]
+			return [False, lista+quad, novoTemp]
+
+		elif(Atual.token == Token.sub):
+			self.consome(Token.sub)
+			[bol, lista, result] = self.uno()
+			novoTemp = self.geraTemp()
+			quad = ['-', novoTemp,'0',result]
+			return [False, lista+quad, novoTemp]
 		else:
 			return self.fator()
-		return False
 
-	# OK
+	# OK OK
 	def fator(self):
 		if (Atual.token == Token.ident):
 			if not Atual.lexema in self.tabSimb:
 				raise ErroSemantico(Atual.lexema)
 			self.consome(Token.ident)
+			#novoTemp = self.geraTemp()
+			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
+			#return [True, quad, Atual.lexico.lexema]
 			return [True, [], Atual.lexico.lexema]
 		elif(Atual.token == Token.abrePar):
 			self.consome(Token.abrePar)
-			aux = [False, lista, res] = self.atrib()
+			aux = [False, lista, result] = self.atrib()
 			self.consome(Token.fechaPar)
 			return aux
 		elif (Atual.token == Token.NUMint):
 			self.consome(Token.NUMint)
+			#novoTemp = self.geraTemp()
+			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
+			#return [True, quad, Atual.lexico.lexema]
 			return [False, [], Atual.lexico.lexema]
 		else:
 			self.consome(Token.NUMfloat)
+			#novoTemp = self.geraTemp()
+			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
+			#return [True, quad, Atual.lexico.lexema]
 			return [False, [], Atual.lexico.lexema]
-		return False
