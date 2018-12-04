@@ -254,8 +254,14 @@ class Sintatico(object):
 
 	# OK
 	def outList(self):
-		self.out()
-		self.restoOutList()
+		lexema = self.out()
+		[bol2, lista2, result2] = self.restoOutList(lexema)
+
+		if not bol2:
+			return [[], lexema]
+		else:
+			return [lexema+lista2, result2]
+			
 
 	# OK
 	def out(self):
@@ -274,14 +280,15 @@ class Sintatico(object):
 		return Atual.lexico.lexema
 
 	# OK
-	def restoOutList(self):
+	def restoOutList(self,f1):
 		if(Atual.token == Token.virg):
 			self.consome(Token.virg)
 ############################
 			lexema = self.out()
-			self.restoOutList()
-		else: 
-			pass
+			[lista1, result1] = self.restoOutList(f1)
+			return [True, lexema+lista1, result1]
+		else:
+			return [False, [], f1]
 
 	''' 
 		Comando WHILE
