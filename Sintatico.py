@@ -42,16 +42,16 @@ class Sintatico(object):
 			Atual.token = self.lexico.getToken()
 			codigo = self.function()
 			self.consome(Token.eof)
-			print('Codigo Final:')
-			print(codigo)
+			# print('Codigo Final:')
+			# print(codigo)
 			
-			print('Codigo Separado:')
-			for c in codigo:
-				print(c)
-				# for d in c:
-				# 	print('### Lista Secundaria')
-				# 	print(d)
-				print('###')
+			# print('Codigo Separado:')
+			# for c in codigo:
+			# 	print(c)
+			# 	# for d in c:
+			# 	# 	print('### Lista Secundaria')
+			# 	# 	print(d)
+			# 	print('###')
 		except ErroSintatico as e:
 			print(e)
 			raise 
@@ -185,8 +185,6 @@ class Sintatico(object):
 
 	# OK
 	def stmt(self, inicio, fim):
-		print('--------Atual TOken')
-		print(Atual.token)
 		if((Atual.token == Token.printe) or (Atual.token == Token.scan)):
 			return self.ioStmt()
 		elif(Atual.token == Token.foor):
@@ -490,6 +488,10 @@ class Sintatico(object):
 			quad = ['=', novoTemp, f1, f2]
 ###################
 			return [bol1, lista1+quad, f2]
+			# if bol1:
+			# 	return [False, lista1+quad, f2]
+			# else:
+			# 	return [False, quad, f2]
 		else:
 			return [True, [], f1]
 

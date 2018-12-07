@@ -1,4 +1,4 @@
-class MaquinaVirtual(object):
+class VirtualMachine(object):
 
 	def __init__(self, lista):
 		self.operadores  = ['+', '-', '*', '/', '%', '>', '<', '==', '>=', '<=', '!=']
@@ -171,8 +171,19 @@ class MaquinaVirtual(object):
 
 if __name__ == '__main__':
 	
-	lista1 = [['call','scan', 'a', None, 'call', 'scan','b', None, '+', 'c', 'a', 'b'], '>', 'temp', 'a', 'b', 'if','temp','maior','menor', 'label','maior', None, None, 'call','print','"a maior"', None,'jump', 'fim', None, None, 'label', 'menor', None, None, 'call', 'print', 'b maior', None, 'label', 'fim', None, None, 'call', 'break', None, None]
-	m = MaquinaVirtual(lista1)
+	lista1 = [['call','scan', 'a', None, 
+				'call', 'scan','b', None, 
+				'+', 'c', 'a', 'b'], 
+				'>', 'temp', 'a', 'b', 
+				'if','temp','maior','menor', 
+				'label','maior', None, None, 
+				'call','print','"a maior"', None,
+				'jump', 'fim', None, None, 
+				'label', 'menor', None, None, 
+				'call', 'print', 'b maior', None, 
+				'label', 'fim', None, None, 
+				'call', 'break', None, None]
+	m = VirtualMachine(lista1)
 	# print('lista1')
 	# print(lista1)
 	m.lista = m.transforma(lista1)

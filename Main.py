@@ -35,10 +35,12 @@ class Main:
 	codigo = sin.parse()
 	
 	# vt = VirtualMachine.VirtualMachine(codigo)
-
+	# print('codigo')
+	# print(codigo)
 	# vt.transforma(codigo)
-
 	# vt.executaQuadruplas()
+
+
 	# file = sys.argv[1]
 	# arquivo = open(file, 'r')
 	# lexico = Lexico.Arquivo(arquivo.read())

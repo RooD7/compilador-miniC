@@ -14,24 +14,15 @@ int main() {
 	b = 4;
 	c = a + b;
 
-	scan(b);
+	// a = b = 4;
 
-	if (!(c < 3) == (!(b > 1))){
-		float b;
+	if (c < 3) {
 		if (a > 1) {
 			a = 3;
 		}
 	}
 	else {
-		int a;
+		b = 5;
 	}
-	while(c < 30) {
-		c = c + 1;
-	}
-	return a;
-
-	int i;
-	for(i = 0; i < 10; i = i + 1) {
-		b = b + 1;
-	}
+	
 } 
