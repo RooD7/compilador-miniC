@@ -79,7 +79,7 @@ class Arquivo:
 			#print('LINHA = ',Atual.linha)
 			#print('CAR = ',car)
 			#print('COLUNA = ',Atual.coluna)
-			#print('LEXEMA = ',Atual.lexema)
+			print('LEXEMA = ',Atual.lexema)
 			#print('TOKEN = ',Atual.token)
 
 			if(estado == 1):
@@ -263,6 +263,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.ife
 				else:
+					self.returCar(car)
 					estado = 2
 			## float
 			elif (estado == 13):
@@ -286,6 +287,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.foor
 				else:
+					self.returCar(car)
 					estado = 2
 			elif (estado == 14):
 				if((car == '=') and (prev == '=')):
@@ -309,6 +311,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.printe
 				else:
+					self.returCar(car)
 					estado = 2
 			## scan
 			elif (estado == 16):
@@ -323,6 +326,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.scan
 				else:
+					self.returCar(car)
 					estado = 2
 			## while
 			elif (estado == 17):
@@ -339,6 +343,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.whilee
 				else:
+					self.returCar(car)
 					estado = 2
 			## strg
 			elif (estado == 18):
@@ -374,6 +379,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.elsee
 				else:
+					self.returCar(car)
 					estado = 2
 			## >, >=
 			elif(estado == 22):
@@ -437,6 +443,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.continuee
 				else:
+					self.returCar(car)
 					estado = 2
 			## return
 			elif (estado == 28):
@@ -454,6 +461,7 @@ class Arquivo:
 					self.returCar(car)
 					return Token.returne
 				else:
+					self.returCar(car)
 					estado = 2
 
 
