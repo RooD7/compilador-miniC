@@ -50,10 +50,10 @@ class Sintatico(object):
 
 	# OK
 	def consome(self, tk):
-		print('#### '+str(Atual.token)+' - '+str(Atual.lexema))
-		print(Atual.lexema)
 		if(tk == Atual.token):
+			print('####1 '+str(Atual.token)+' - '+str(Atual.lexema))
 			Atual.token = self.lexico.getToken()
+			print('####2 '+str(Atual.token)+' - '+str(Atual.lexema))
 		else:
 			raise ErroSintatico(tk)
 
@@ -139,27 +139,32 @@ class Sintatico(object):
 	# OK
 	def bloco(self):
 		self.consome(Token.abreCha)
-		aux = self.stmtList()
+		[bol1, lista1, result2] = self.stmtList([])
 		self.consome(Token.fechaCha)
-		return aux
+		return [bol1, lista1, result2]
 
 	# OK
-	def stmtList(self):
+	def stmtList(self, f1):
 		if((Atual.token == Token.note) or (Atual.token == Token.abrePar) or 
 			(Atual.token == Token.soma) or (Atual.token == Token.sub) or 
 			(Atual.token == Token.ptoVirg) or (Atual.token == Token.ident) or 
 			(Atual.token == Token.NUMint) or (Atual.token == Token.NUMfloat) or 
 			(Atual.token == Token.breack) or (Atual.token == Token.continuee) or 
-			(Atual.token == Token.returne) or (Atual.token == Token.inte) or 
-			(Atual.token == Token.floate) or (Atual.token == Token.foor) or 
+			(Atual.token == Token.returne) or (Atual.token == Token.foor) or 
 			(Atual.token == Token.ife) or (Atual.token == Token.printe) or 
 			(Atual.token == Token.scan) or (Atual.token == Token.whilee) or 
 			(Atual.token == Token.abreCha)):
 			result1 = self.stmt()
-			[bol1, lista1, result2] = self.stmtList()
-			return [True, lista1, result1+result2]
+			[bol1, lista1, result2] = self.stmtList(result1)
+			return [True, lista1, result2]
+		elif((Atual.token == Token.inte) or (Atual.token == Token.floate)):
+			print('declaration')
+			print(Atual.token)
+			[lista1, result1] = self.declaration()
+			[bol2, lista2, result2] = self.stmtList(result1)
+			return [True, lista1+lista2, result2]
 		else:
-			return [False, [], []]
+			return [False, [], f1]
 
 	# OK
 	def stmt(self):
@@ -178,20 +183,20 @@ class Sintatico(object):
 		elif(Atual.token == Token.breack):
 			self.consome(Token.breack)
 			self.consome(Token.ptoVirg)
-			return ['call','break',None,None]
+			codigo = []
+			codigo += ['call','break',None,None]
+			return [[], codigo]
 		elif(Atual.token == Token.continuee):
 			self.consome(Token.continuee)
 			self.consome(Token.ptoVirg)
-			return ['call','continue',None,None]
+			codigo = []
+			codigo += ['call','continue',None,None]
+			return [[], codigo]
 		elif(Atual.token == Token.returne):
 			self.consome(Token.returne)
-			aux = self.fator()
+			[bol1, lista1, result1] = self.fator()
 			self.consome(Token.ptoVirg)
-			return aux
-		elif((Atual.token == Token.inte) or (Atual.token == Token.floate)):
-			print('declaration')
-			print(Atual.token)
-			return self.declaration()
+			return [lista1, result1]
 		elif(Atual.token == Token.ptoVirg):
 			self.consome(Token.ptoVirg)
 		 # elif((Atual.token == Token.note) or ((Atual.token == Token.soma) or 
@@ -199,9 +204,9 @@ class Sintatico(object):
 			# (Atual.token == Token.NUMfloat) or (Atual.token == Token.ident) or 
 			# (Atual.token == Token.abrePar)))):
 		else:
-			aux = self.expr()
+			[lista1, result1] = self.expr()
 			self.consome(Token.ptoVirg)
-			return aux
+			return [lista1, result1]
 
 	'''
 		###############################
@@ -254,8 +259,7 @@ class Sintatico(object):
 		self.consome(Token.ptoVirg)
 		[lista_OpExpr3, result_OpExpr3] = self.optExpr()
 		self.consome(Token.fechaPar)
-		[lista_stmt, result_stmt] = self.stmt()
-
+		lista_stmt = self.stmt()
 
 		inicio1 	= self.geraLabel()
 		inicio2 	= self.geraLabel()
@@ -289,59 +293,72 @@ class Sintatico(object):
 		if(Atual.token == Token.scan):
 			self.consome(Token.scan)
 			self.consome(Token.abrePar)
-			self.consome(Token.strg)
-			self.consome(Token.virg)
 			if not Atual.lexema in self.tabSimb:
 				raise ErroSemantico(Atual.lexema)
+			aux = Atual.lexema
 			self.consome(Token.ident)
+
+			#self.consome(Token.strg)
+			#self.consome(Token.virg)
+			#self.consome(Token.ident)
+			
 			self.consome(Token.fechaPar)
 			self.consome(Token.ptoVirg)
-			# ['call','scan',result1]
+			#novoTemp = self.geraTemp()
+			codigo = ['call','scan', aux]
+			return [[], codigo]
 #############################
 		# elif(Atual.token == Token.printe):
 		else:
 			self.consome(Token.printe)
 			self.consome(Token.abrePar)
 			[lista1, result1] = self.outList()
-			['call','print',result1]
+			codigo = ['call','print',result1]
 			self.consome(Token.fechaPar)
 			self.consome(Token.ptoVirg)
+			return [[], codigo]
 
 	# OK
 	def outList(self):
-		lexema = self.out()
-		[bol2, lista2, result2] = self.restoOutList(lexema)
+		result1 = self.out()
+		[bol2, lista2, result2] = self.restoOutList(result1)
 
 		if not bol2:
-			return [[], lexema]
+			return [[], result1]
 		else:
-			return [lexema+lista2, result2]
+			return [lista2, result1+result2]
 			
 
 	# OK
 	def out(self):
 		if(Atual.token == Token.strg):
+			aux = Atual.lexema
 			self.consome(Token.strg)
 		elif(Atual.token == Token.ident):
 			if not Atual.lexema in self.tabSimb:
 				raise ErroSemantico(Atual.lexema)
+			aux = Atual.lexema
 			self.consome(Token.ident)
 		elif(Atual.token == Token.NUMint):
+			aux = Atual.lexema
 			self.consome(Token.NUMint)
 		# elif(Atual.token == Token.NUMfloat):
 		else:
+			aux = Atual.lexema
 			self.consome(Token.NUMfloat)
 ##############################
-		return Atual.lexema
+		cod = []
+		cod += aux
+		return cod
 
 	# OK
 	def restoOutList(self,f1):
 		if(Atual.token == Token.virg):
 			self.consome(Token.virg)
 ############################
-			lexema = self.out()
-			[bol1, lista1, result1] = self.restoOutList(f1)
-			return [bol1, [lexema]+lista1, result1]
+			result1 = self.out()
+			[bol2, lista2, result2] = self.restoOutList(f1)
+			return [bol2, lista2, result1+result2]
 		else:
 			return [False, [], f1]
 
@@ -360,7 +377,7 @@ class Sintatico(object):
 		inicio2 	= self.geraLabel()
 		fim 		= self.geraLabel()
 		# self.stmt()
-		listaCom = self.stmt(inicio, fim)
+		listaCom = self.stmt()
 		codigo = []
 		codigo += ['label', inicio1, None, None]
 		codigo += lista
@@ -369,7 +386,7 @@ class Sintatico(object):
 		codigo += listaCom
 		codigo += ['jump', inicio1, None, None]
 		codigo += ['label', fim, None, None]
-		return codigo
+		return [[],codigo]
 
 
 	'''
@@ -396,7 +413,7 @@ class Sintatico(object):
 		codigo += ['label', inicio_el, None, None]
 		codigo += lista_else
 		codigo += ['label', fim_if, None, None]
-		return codigo
+		return [[],codigo]
 
 
 	# OK
@@ -425,17 +442,7 @@ class Sintatico(object):
 		[bol2, lista2, result2] = self.restoAtrib(result1)
 		#verificar a condicao
 		#if bol2:
-		print(Atual.lexema)
-		print('bol1 = '+str(bol1))
-		print('lista1')
-		print(lista1)
-		print('result1')
-		print(result1)
-		print('bol2 = '+str(bol2))
-		print('lista2')
-		print(lista2)
-		print('result2')
-		print(result2)
+
 		if not bol2:
 			# return [bol1, lista1, result1]
 			return [bol1, lista1, result1]
@@ -662,25 +669,28 @@ class Sintatico(object):
 		if (Atual.token == Token.ident):
 			if not Atual.lexema in self.tabSimb:
 				raise ErroSemantico(Atual.lexema)
+			aux = Atual.lexema
 			self.consome(Token.ident)
 			#novoTemp = self.geraTemp()
 			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
 			#return [True, quad, Atual.lexico.lexema]
-			return [True, [], Atual.lexema]
+			return [True, [], aux]
 		elif(Atual.token == Token.abrePar):
 			self.consome(Token.abrePar)
 			aux = self.atrib()
 			self.consome(Token.fechaPar)
 			return aux
 		elif (Atual.token == Token.NUMint):
+			aux = Atual.lexema
 			self.consome(Token.NUMint)
 			#novoTemp = self.geraTemp()
 			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
 			#return [True, quad, Atual.lexico.lexema]
-			return [False, [], Atual.lexema]
+			return [False, [], aux]
 		else:
+			aux = Atual.lexema
 			self.consome(Token.NUMfloat)
 			#novoTemp = self.geraTemp()
 			#quad = ['+', novoTemp, 0, Atual.lexico.lexema]
 			#return [True, quad, Atual.lexico.lexema]
-			return [False, [], Atual.lexema]
+			return [False, [], aux]

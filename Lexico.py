@@ -79,7 +79,7 @@ class Arquivo:
 			#print('LINHA = ',Atual.linha)
 			#print('CAR = ',car)
 			#print('COLUNA = ',Atual.coluna)
-			print('LEXEMA = ',Atual.lexema)
+			#print('LEXEMA = ',Atual.lexema)
 			#print('TOKEN = ',Atual.token)
 
 			if(estado == 1):
@@ -363,8 +363,10 @@ class Arquivo:
 			## !, !=
 			elif(estado == 20):
 				if((car == '=') and (prev == '!')):
+					#self.returCar(car)
 					return Token.difer
 				else:
+					self.returCar(car)
 					return Token.note
 			## else
 			elif (estado == 21):
