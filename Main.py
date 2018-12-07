@@ -23,6 +23,7 @@ Tipo de Compilador:
 '''
 import Lexico
 import Sintatico
+import VirtualMachine
 import argparse
 import sys
 
@@ -31,8 +32,13 @@ class Main:
 
 	file = sys.argv[1]
 	sin = Sintatico.Sintatico(file)
-	sin.parse()
+	codigo = sin.parse()
 	
+	# vt = VirtualMachine.VirtualMachine(codigo)
+
+	# vt.transforma(codigo)
+
+	# vt.executaQuadruplas()
 	# file = sys.argv[1]
 	# arquivo = open(file, 'r')
 	# lexico = Lexico.Arquivo(arquivo.read())
